@@ -288,8 +288,17 @@
         // Function to parse markdown links
         function parseMarkdownLinks(content) {
             const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-            return content.replace(regex, '<a href="$2" target="_blank">$1</a>');
+            
+            return content.replace(regex, (match, text, url) => {
+                // Check if the URL ends with a typical image extension
+                if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                    return `<img src="${url}" alt="${text}" style="max-width: 100%; height: auto;">`;
+                } else {
+                    return `<a href="${url}" target="_blank">${text}</a>`;
+                }
+            });
         }
+
 
         // Function to create post element
         function createPostElement(post) {
