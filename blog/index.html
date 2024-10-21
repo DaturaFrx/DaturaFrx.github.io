@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamcore Vibes - A Pastel Journey</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #ffd1dc;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #6a5acd;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            color: #ff69b4;
+            text-shadow: 2px 2px #87cefa;
+        }
+        .post {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.3);
+            animation: gentle-float 3s ease-in-out infinite;
+        }
+        .post-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #9370db;
+        }
+        .post-date {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #20b2aa;
+        }
+        .post-content {
+            font-size: 16px;
+        }
+        .rainbow-text {
+            background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: rainbow-animation 5s linear infinite;
+        }
+        @keyframes rainbow-animation {
+            to {
+                background-position: 200vh;
+            }
+        }
+        @keyframes gentle-float {
+            0% { transform: translate(0, 0px); }
+            50% { transform: translate(0, 5px); }
+            100% { transform: translate(0, -0px); }
+        }
+        .glitch {
+            position: relative;
+        }
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 77px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+
+        .banner {
+            background-color: #9370db;
+            height: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px #0000ff;
+        }
+
+        .smaww {
+            width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner top-banner">TUM TUM ACHES ARE THE WORST</div>
+
+    <h1 class="rainbow-text">✨ END ME ✨</h1>
+    
+    <div id="posts-container">
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <img src="awesomeStuff/kitty.webp" alt="Spinning geometry" class="smaww" style="animation: gentle-float 2s ease-in-out infinite, spin 4s linear infinite;">
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBe1NhTQzJYd695UMnmg-xbiM73qbmYBZs",
+            authDomain: "blog-c3484.firebaseapp.com",
+            projectId: "blog-c3484",
+            storageBucket: "blog-c3484.appspot.com",
+            messagingSenderId: "352963794904",
+            appId: "1:352963794904:web:5637900dfd52f48e6bc4ad",
+            measurementId: "G-ZLBCG2SJCH"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+    
+        function parseMarkdownLinks(content) {
+            const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+            return content.replace(regex, '<a href="$2" target="_blank">$1</a>');
+        }
+    
+        function createPostElement(post) {
+            const postElement = document.createElement('div');
+            postElement.className = 'post';
+            
+            const parsedContent = parseMarkdownLinks(post.content);
+            
+            postElement.innerHTML = `
+                <div class="post-title glitch" data-text="${post.title}">${post.title}</div>
+                <div class="post-date">Posted on: ${post.date}</div>
+                <div class="post-content">${parsedContent}</div>
+            `;
+            return postElement;
+        }
+    
+        function fetchAndDisplayPosts() {
+            const postsRef = ref(database, 'posts');
+            onValue(postsRef, (snapshot) => {
+                const postsContainer = document.getElementById('posts-container');
+                postsContainer.innerHTML = ''; // Clear existing posts
+                const data = snapshot.val();
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const post = data[key];
+                        const postElement = createPostElement(post);
+                        postsContainer.appendChild(postElement);
+                    }
+                }
+            });
+        }
+    
+        fetchAndDisplayPosts();
+    </script>
+    
+    <div class="banner bottom-banner">IM GONNA BROWN</div>
+    </body>    
+</html>
