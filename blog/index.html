@@ -101,10 +101,58 @@
             100% { clip: rect(82px, 9999px, 64px, 0); }
         }
 
+        .menu-button {
+            background-color: #ff69b4;
+            border: none;
+            color: white;
+            padding: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 100px;
+            position: relative;
+            width: 80px;
+            text-align: center;
+            margin: 20px; 
+        }
+
+        .menu-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            min-width: 160px;
+            top: 35px;
+            left: 0;
+            border-radius: 5px;
+        }
+
+        .menu-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .menu-content a:hover {
+            background-color: #ddd;
+        }
+
+        .menu-button:hover .menu-content {
+            display: block;
+        }
+
+        .menu-button:hover {
+            background-color: #ff1493;
+        }
+
         .banner {
             background-color: #9370db;
             height: 30px;
             width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -112,7 +160,20 @@
             text-shadow: 2px 2px #0000ff;
         }
 
-        .smaww {
+        .footer {
+            background-color: #9370db;
+            height: 30px;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px #0000ff;
+        }
+
+        .small {
             width: 100px;
             height: auto;
         }
@@ -120,14 +181,24 @@
 </head>
 <body>
     <div class="banner top-banner">TUM TUM ACHES ARE THE WORST</div>
+    <div class="menu-button">
+        Menu
+        <div class="menu-content">
+            <a href="#" id="menu-posts">Posts - Default ╰(*°▽°*)╯</a>
+            <a href="#" id="menu-music">Music (≧∇≦)ﾉ</a>
+            <a href="#" id="menu-pictures">Pictures (ง •_•)ง</a>
+        </div>
+    </div>
 
     <h1 class="rainbow-text">✨ END ME ✨</h1>
-    
-    <div id="posts-container">
+
+    <div id="display-container">
+        <!-- Content will be displayed here -->
+        <div id="posts-container"></div>
     </div>
 
     <div style="text-align: center; margin-top: 50px;">
-        <img src="awesomeStuff/kitty.webp" alt="Spinning geometry" class="smaww" style="animation: gentle-float 2s ease-in-out infinite, spin 4s linear infinite;">
+        <img src="awesomeStuff/kitty.webp" alt="Spinning geometry" class="small" style="animation: gentle-float 2s ease-in-out infinite, spin 4s linear infinite;">
     </div>
 
     <script type="module">
@@ -136,7 +207,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
     
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBe1NhTQzJYd695UMnmg-xbiM73qbmYBZs",
             authDomain: "blog-c3484.firebaseapp.com",
@@ -151,12 +222,75 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
-    
+
+        function clearScreen() {
+            const displayContainer = document.getElementById('display-container');
+            displayContainer.innerHTML = '';  // Clears the screen
+        }
+
+        function showContent(content) {
+            const displayContainer = document.getElementById('display-container');
+            displayContainer.innerHTML = `<div class="content">${content}</div>`;
+        }
+
+        // Fetch and display posts
+        function fetchAndDisplayPosts() {
+            clearScreen();
+            const postsRef = ref(database, 'posts');
+            onValue(postsRef, (snapshot) => {
+                const data = snapshot.val();
+                const displayContainer = document.getElementById('display-container');
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const post = data[key];
+                        const postElement = createPostElement(post);
+                        displayContainer.appendChild(postElement);
+                    }
+                }
+            });
+        }
+
+        // Fetch and display music
+        function fetchAndDisplayMusic() {
+            clearScreen();
+            const musicRef = ref(database, 'music');
+            onValue(musicRef, (snapshot) => {
+                const data = snapshot.val();
+                const displayContainer = document.getElementById('display-container');
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const track = data[key];
+                        const trackElement = createPostElement(track); // Reuse post element function
+                        displayContainer.appendChild(trackElement);
+                    }
+                }
+            });
+        }
+
+        // Fetch and display pictures
+        function fetchAndDisplayPictures() {
+            clearScreen();
+            const picturesRef = ref(database, 'pictures');
+            onValue(picturesRef, (snapshot) => {
+                const data = snapshot.val();
+                const displayContainer = document.getElementById('display-container');
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const picture = data[key];
+                        const pictureElement = createPostElement(picture); // Reuse post element function
+                        displayContainer.appendChild(pictureElement);
+                    }
+                }
+            });
+        }
+
+        // Function to parse markdown links
         function parseMarkdownLinks(content) {
             const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
             return content.replace(regex, '<a href="$2" target="_blank">$1</a>');
         }
-    
+
+        // Function to create post element
         function createPostElement(post) {
             const postElement = document.createElement('div');
             postElement.className = 'post';
@@ -165,31 +299,33 @@
             
             postElement.innerHTML = `
                 <div class="post-title glitch" data-text="${post.title}">${post.title}</div>
-                <div class="post-date">Posted on: ${post.date}</div>
+                <div class="post-date">${post.date}</div>
                 <div class="post-content">${parsedContent}</div>
             `;
             return postElement;
         }
-    
-        function fetchAndDisplayPosts() {
-            const postsRef = ref(database, 'posts');
-            onValue(postsRef, (snapshot) => {
-                const postsContainer = document.getElementById('posts-container');
-                postsContainer.innerHTML = ''; // Clear existing posts
-                const data = snapshot.val();
-                for (let key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        const post = data[key];
-                        const postElement = createPostElement(post);
-                        postsContainer.appendChild(postElement);
-                    }
-                }
-            });
-        }
-    
+
+        // Menu event listeners
+        document.getElementById("menu-posts").addEventListener("click", (e) => {
+            e.preventDefault();
+            fetchAndDisplayPosts();
+        });
+
+        document.getElementById("menu-music").addEventListener("click", (e) => {
+            e.preventDefault();
+            fetchAndDisplayMusic();
+        });
+
+        document.getElementById("menu-pictures").addEventListener("click", (e) => {
+            e.preventDefault();
+            fetchAndDisplayPictures();
+        });
+
+        // Fetch and display posts initially by default
         fetchAndDisplayPosts();
+
     </script>
-    
+
     <div class="banner bottom-banner">IM GONNA BROWN</div>
-    </body>    
+</body>    
 </html>
