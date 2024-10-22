@@ -191,7 +191,7 @@
             .arrow {
                 bottom: 10px;
                 top: auto;
-                left: 50%;
+                left: 135px;
                 transform: translateX(-50%);
             }
             .arrow.up, .arrow.down {
@@ -219,10 +219,9 @@
     <div class="arrow up" id="upArrow">up</div>
     <div class="arrow down" id="downArrow">down</div>
 
-    <h1 class="rainbow-text">✨ END ME ✨</h1>
+    <h1 class="rainbow-text">╯︿╰ THE SIGMA BLOG 〒▽〒</h1>
 
     <div id="display-container">
-        <!-- Content will be displayed here -->
         <div id="posts-container"></div>
     </div>
 
@@ -345,7 +344,7 @@
             const parsedContent = parseMarkdownLinks(post.content);
             
             postElement.innerHTML = `
-                <div class="post-title glitch" data-text="${post.title}">${post.title}</div>
+                <div class="post-title" data-text="${post.title}">${post.title}</div>
                 <div class="post-date">${post.date}</div>
                 <div class="post-content">${parsedContent}</div>
             `;
