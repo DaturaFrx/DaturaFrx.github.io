@@ -159,10 +159,49 @@
             color: white;
             text-shadow: 2px 2px #0000ff;
         }
-        
+
         .small {
             width: 100px;
             height: auto;
+        }
+
+        .arrow {
+            position: fixed;
+            top: 50%;
+            right: 10px;
+            font-size: 2rem;
+            display: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .arrow.show {
+            display: block;
+        }
+
+        .arrow.up {
+            transform: rotate(90deg);
+        }
+
+        .arrow.down {
+            transform: rotate(-90deg);
+        }
+
+        @media (max-width: 768px) {
+            .arrow {
+                bottom: 10px;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .arrow.up, .arrow.down {
+                transform: none;
+            }
+        }
+        .square {
+            width: 100px;
+            height: 100px;
+            background-color: red;
         }
     </style>
 </head>
@@ -176,6 +215,9 @@
             <a href="#" id="menu-pictures">Pictures (ง •_•)ง</a>
         </div>
     </div>
+
+    <div class="arrow up" id="upArrow">up</div>
+    <div class="arrow down" id="downArrow">down</div>
 
     <h1 class="rainbow-text">✨ END ME ✨</h1>
 
@@ -270,17 +312,29 @@
         // Function to parse markdown links
         function parseMarkdownLinks(content) {
             const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-            
+
             return content.replace(regex, (match, text, url) => {
                 // Check if the URL ends with a typical image extension
                 if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                    return `<img src="${url}" alt="${text}" style="max-width: 100%; height: auto;">`;
+                    // Check if the markdown has 11[]() in the start
+                    if (match.startsWith('11')) {
+                        return `
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <img src="${url}" alt="${text}" style="max-width: 100%; height: auto; object-fit: cover;">
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <img src="${url}" alt="${text}" style="max-width: 100%; height: auto;">
+                            </div>
+                        `;
+                    }
                 } else {
                     return `<a href="${url}" target="_blank">${text}</a>`;
                 }
             });
         }
-
 
         // Function to create post element
         function createPostElement(post) {
@@ -316,6 +370,32 @@
         // Fetch and display posts initially by default
         fetchAndDisplayPosts();
 
+        const upArrow = document.getElementById('upArrow');
+        const downArrow = document.getElementById('downArrow');
+
+        function updateArrowVisibility() {
+            const scrollPosition = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+            upArrow.classList.toggle('show', scrollPosition > 100);
+            downArrow.classList.toggle('show', scrollPosition < maxScroll - 20); // Smaller threshold for down arrow
+        }
+
+        let upArrowTimeout;
+        window.addEventListener('scroll', () => {
+            updateArrowVisibility();
+            clearTimeout(upArrowTimeout);
+            upArrowTimeout = setTimeout(() => {
+                upArrow.classList.remove('show');
+            }, 2000);
+        });
+
+        upArrow.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        downArrow.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
+
+        updateArrowVisibility();
+
+        downArrow.classList.add('show');
     </script>
 </body>    
 </html>
