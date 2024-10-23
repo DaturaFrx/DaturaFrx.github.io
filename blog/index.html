@@ -198,6 +198,25 @@
                 transform: none;
             }
         }
+
+        .loader-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-gif {
+            width: 50px;
+            height: 50px;
+        }
+
         .square {
             width: 100px;
             height: 100px;
@@ -219,11 +238,15 @@
     <div class="arrow up" id="upArrow">up</div>
     <div class="arrow down" id="downArrow">down</div>
 
-    <h1 class="rainbow-text">✨ END ME ✨</h1>
+    <h1 class="rainbow-text">(≧∀≦)ゞ THE SIGMA BLOG O(∩_∩)O</h1>
 
     <div id="display-container">
         <!-- Content will be displayed here -->
         <div id="posts-container"></div>
+    </div>
+
+    <div class="loader-container" id="loader">
+        <img src="https://media.tenor.com/wpSo-8CrXqUAAAAi/loading-loading-forever.gif" alt="Loading..." class="loader-gif">
     </div>
 
     <script type="module">
@@ -250,6 +273,16 @@
 
         let currentListener = null;
 
+        function showLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'none';
+        }
+
         function clearScreen() {
             const displayContainer = document.getElementById('display-container');
             displayContainer.innerHTML = '';  // Clears the screen
@@ -264,18 +297,33 @@
         // Fetch and display posts
         function fetchAndDisplayPosts() {
             clearScreen();
+            showLoader(); // Show loader before fetching data
+            
             const postsRef = ref(database, 'posts');
             currentListener = onValue(postsRef, (snapshot) => {
                 const data = snapshot.val();
                 const displayContainer = document.getElementById('display-container');
                 displayContainer.innerHTML = '';
-                for (let key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        const post = data[key];
-                        const postElement = createPostElement(post);
-                        displayContainer.appendChild(postElement);
+                
+                if (data) {
+                    for (let key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            const post = data[key];
+                            const postElement = createPostElement(post);
+                            displayContainer.appendChild(postElement);
+                        }
                     }
+                } else {
+                    // Handle case when there are no posts
+                    displayContainer.innerHTML = '<p>No posts found</p>';
                 }
+                
+                hideLoader(); // Hide loader after posts are displayed
+            }, (error) => {
+                console.error("Error fetching posts:", error);
+                const displayContainer = document.getElementById('display-container');
+                displayContainer.innerHTML = '<p>Error loading posts. Please try again later.</p>';
+                hideLoader(); // Hide loader if there's an error
             });
         }
 
