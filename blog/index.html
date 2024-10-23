@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigmas Be Here</title>
-    <link rel="icon" type="image/x-icon" href="awesomeStuff/neko-cat.gif">
+    <title>I HATE IT HERE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
         
@@ -192,7 +191,7 @@
             .arrow {
                 bottom: 10px;
                 top: auto;
-                left: 135px;
+                left: 50%;
                 transform: translateX(-50%);
             }
             .arrow.up, .arrow.down {
@@ -207,8 +206,7 @@
     </style>
 </head>
 <body>
-    <div class="banner">Retroshare ID: ABA9tp13B8UrZlYiVSMS26LAAxT4JTdYesnD/EgNJi457n/8RWPUqwEGRGF0dXJhkwYNDAAKCFuSBnu9qskIWwQDSboT
-</div>
+    <div class="banner">TUM TUM ACHES ARE THE WORST</div>
     <div class="menu-button">
         Menu
         <div class="menu-content">
@@ -221,9 +219,10 @@
     <div class="arrow up" id="upArrow">up</div>
     <div class="arrow down" id="downArrow">down</div>
 
-    <h1 class="rainbow-text">╯︿╰ THE SIGMA BLOG 〒▽〒</h1>
+    <h1 class="rainbow-text">✨ END ME ✨</h1>
 
     <div id="display-container">
+        <!-- Content will be displayed here -->
         <div id="posts-container"></div>
     </div>
 
@@ -249,23 +248,27 @@
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
 
+        let currentListener = null;
+
         function clearScreen() {
             const displayContainer = document.getElementById('display-container');
             displayContainer.innerHTML = '';  // Clears the screen
-        }
-
-        function showContent(content) {
-            const displayContainer = document.getElementById('display-container');
-            displayContainer.innerHTML = `<div class="content">${content}</div>`;
+            
+            // Remove existing listener if there is one
+            if (currentListener) {
+                currentListener();
+                currentListener = null;
+            }
         }
 
         // Fetch and display posts
         function fetchAndDisplayPosts() {
             clearScreen();
             const postsRef = ref(database, 'posts');
-            onValue(postsRef, (snapshot) => {
+            currentListener = onValue(postsRef, (snapshot) => {
                 const data = snapshot.val();
                 const displayContainer = document.getElementById('display-container');
+                displayContainer.innerHTML = '';
                 for (let key in data) {
                     if (data.hasOwnProperty(key)) {
                         const post = data[key];
@@ -280,13 +283,14 @@
         function fetchAndDisplayMusic() {
             clearScreen();
             const musicRef = ref(database, 'music');
-            onValue(musicRef, (snapshot) => {
+            currentListener = onValue(musicRef, (snapshot) => {
                 const data = snapshot.val();
                 const displayContainer = document.getElementById('display-container');
+                displayContainer.innerHTML = '';
                 for (let key in data) {
                     if (data.hasOwnProperty(key)) {
                         const track = data[key];
-                        const trackElement = createPostElement(track); // Reuse post element function
+                        const trackElement = createPostElement(track);
                         displayContainer.appendChild(trackElement);
                     }
                 }
@@ -297,13 +301,14 @@
         function fetchAndDisplayPictures() {
             clearScreen();
             const picturesRef = ref(database, 'pictures');
-            onValue(picturesRef, (snapshot) => {
+            currentListener = onValue(picturesRef, (snapshot) => {
                 const data = snapshot.val();
                 const displayContainer = document.getElementById('display-container');
+                displayContainer.innerHTML = '';
                 for (let key in data) {
                     if (data.hasOwnProperty(key)) {
                         const picture = data[key];
-                        const pictureElement = createPostElement(picture); // Reuse post element function
+                        const pictureElement = createPostElement(picture);
                         displayContainer.appendChild(pictureElement);
                     }
                 }
@@ -346,43 +351,68 @@
             const parsedContent = parseMarkdownLinks(post.content);
             
             postElement.innerHTML = `
-                <div class="post-title" data-text="${post.title}">${post.title}</div>
+                <div class="post-title glitch" data-text="${post.title}">${post.title}</div>
                 <div class="post-date">${post.date}</div>
                 <div class="post-content">${parsedContent}</div>
             `;
             return postElement;
         }
 
+        // Function to handle content display based on hash
+        function handleContentDisplay() {
+            const hash = window.location.hash || '#posts'; // Default to posts if no hash
+            
+            switch(hash) {
+                case '#music':
+                    fetchAndDisplayMusic();
+                    break;
+                case '#pictures':
+                    fetchAndDisplayPictures();
+                    break;
+                default: // #posts or any other case
+                    fetchAndDisplayPosts();
+                    break;
+            }
+        }
+
         // Menu event listeners
         document.getElementById("menu-posts").addEventListener("click", (e) => {
             e.preventDefault();
+            window.location.hash = 'posts';
             fetchAndDisplayPosts();
         });
 
         document.getElementById("menu-music").addEventListener("click", (e) => {
             e.preventDefault();
+            window.location.hash = 'music';
             fetchAndDisplayMusic();
         });
 
         document.getElementById("menu-pictures").addEventListener("click", (e) => {
             e.preventDefault();
+            window.location.hash = 'pictures';
             fetchAndDisplayPictures();
         });
 
-        // Fetch and display posts initially by default
-        fetchAndDisplayPosts();
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleContentDisplay);
+
+        // Initial load - check hash and display appropriate content
+        window.addEventListener('load', handleContentDisplay);
 
         const upArrow = document.getElementById('upArrow');
         const downArrow = document.getElementById('downArrow');
 
-        // "down" button should apply when scroll is available
-        // Both 'up/down' buttons appear at the same time, because of threshold
         function updateArrowVisibility() {
             const scrollPosition = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercentage = (scrollPosition / maxScroll) * 100;
 
-            upArrow.classList.toggle('show', scrollPosition > 100);
-            downArrow.classList.toggle('show', scrollPosition < maxScroll - 20); // Fix thresholds omg
+            // Show up arrow only when user is near bottom (e.g., last 20% of scroll)
+            upArrow.classList.toggle('show', scrollPercentage >= 80);
+            
+            // Show down arrow only when not at bottom
+            downArrow.classList.toggle('show', scrollPercentage < 95);
         }
 
         let upArrowTimeout;
