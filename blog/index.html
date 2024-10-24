@@ -388,31 +388,94 @@
             });
         }
 
-        // Function to parse markdown links
+        // Function to extract YouTube video ID from various YouTube URL formats
+        function getYouTubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : false;
+        }
+
+        // Function to parse markdown links with support for images, audio, and YouTube
         function parseMarkdownLinks(content) {
             const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-
+            content = content.replace(/\n/g, '<br>');
+            
             return content.replace(regex, (match, text, url) => {
-                // Check if the URL ends with a typical image extension
+                // Handle YouTube links
+                const youtubeId = getYouTubeVideoId(url);
+                if (youtubeId) {
+                    const isMusic = text.toLowerCase() === 'music';
+                    return `
+                        <div class="youtube-container" style="width: 100%; max-width: 800px; margin: 10px auto; aspect-ratio: 16/9;">
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src="https://www.youtube.com/embed/${youtubeId}${isMusic ? '?autoplay=0' : ''}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                style="border-radius: 8px;"
+                            ></iframe>
+                        </div>
+                    `;
+                }
+                
+                // Handle regular audio files
+                if (text.toLowerCase() === 'music') {
+                    return `
+                        <div class="audio-container" style="max-width: 100%; margin: 10px 0;">
+                            <audio controls style="width: 100%;">
+                                <source src="${url}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    `;
+                }
+                
+                // Handle images
                 if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                    // If the label contains 'crop', apply cropping
                     if (text.toLowerCase() === 'crop') {
                         return `
-                            <div style="display: flex; justify-content: center; align-items: center; overflow: hidden; max-width: 100%; max-height: 300px;">
-                                <img src="${url}" alt="${text}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                            <div style="
+                                position: relative;
+                                width: 50%;
+                                max-width: 800px;
+                                height: 400px;
+                                margin: 0 auto;
+                                overflow: hidden;
+                                background-color: #f0f0f0;
+                            ">
+                                <img 
+                                    src="${url}" 
+                                    alt="${text}" 
+                                    style="
+                                        position: absolute;
+                                        left: 50%;
+                                        top: 50%;
+                                        transform: translate(-50%, -50%);
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: cover;
+                                        object-position: center;
+                                    "
+                                    onload="this.style.width = this.naturalWidth >= this.naturalHeight ? 'auto' : '100%';
+                                            this.style.height = this.naturalWidth >= this.naturalHeight ? '100%' : 'auto';
+                                            this.style.maxWidth = 'none';
+                                            this.style.maxHeight = 'none';"
+                                >
                             </div>
                         `;
                     } else {
-                        // For other cases, just display the image without cropping
                         return `
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <img src="${url}" alt="${text}" style="max-width: 100%; height: auto;">
                             </div>
                         `;
                     }
-                } else {
-                    return `<a href="${url}" target="_blank">${text}</a>`;
                 }
+                
+                // Default case: regular link
+                return `<a href="${url}" target="_blank">${text}</a>`;
             });
         }
 
