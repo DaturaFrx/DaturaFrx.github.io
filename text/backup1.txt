@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>P2P</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,29 +9,31 @@
     <link rel="icon" href="files/favicon.ico" type="image/png">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="container">
         <div style="margin-left: 10px;">
             <h1 style="margin-bottom: 0;">Chat 2.1</h1>
             <p style="color: #333; margin-top: 0;">Name pending btw lol</p>
         </div>
-        
+
         <div class="setup-container" id="setupPanel">
             <h3>User Setup</h3>
             <input type="text" id="usernameInput" placeholder="Enter a display name">
             <input type="password" id="passwordInput" placeholder="Set a password (optional)">
             <button onclick="setUsername()">Save Profile</button>
             <a href="#" onclick="showHelp(); return false;">Help</a>
-            <iframe id="helpFrame" style="display: none; width: 100%; height: 200px; border: 1px solid #ddd;" src="hewlPwease.txt"></iframe>
+            <iframe id="helpFrame" style="display: none; width: 100%; height: 200px; border: 1px solid #ddd;"
+                src="hewlPwease.txt"></iframe>
         </div>
-        
+
         <script>
             function showHelp() {
                 const helpFrame = document.getElementById("helpFrame");
                 helpFrame.style.display = helpFrame.style.display === "none" ? "block" : "none";
-                
+
                 if (helpFrame.style.display === "block") {
-                    helpFrame.onload = function() {
+                    helpFrame.onload = function () {
                         const doc = helpFrame.contentDocument || helpFrame.contentWindow.document;
                         const style = doc.createElement("style");
                         style.textContent = "body { background-color: #fff; color: #000; font-family: Arial, sans-serif; padding: 10px; }";
@@ -38,8 +41,8 @@
                     };
                 }
             }
-        </script>                         
-        
+        </script>
+
         <div id="mainPanel" style="display: none;">
             <div>
                 <h3>Your ID: <span id="myId">Generating...</span>
@@ -48,13 +51,13 @@
                 <h3>Your Username: <span id="displayUsername"></span></h3>
                 <div id="status" class="connection-status disconnected">Not connected</div>
             </div>
-            
+
             <script>
                 function generateId() {
-                    const id = "12345-ABCDE"; 
+                    const id = "LOADING...";
                     document.getElementById("myId").innerText = id;
                 }
-            
+
                 function copyIdToClipboard() {
                     const idText = document.getElementById("myId").innerText;
                     navigator.clipboard.writeText(idText).then(() => {
@@ -63,9 +66,9 @@
                         console.error("Failed to copy ID: ", err);
                     });
                 }
-            
+
                 document.addEventListener("DOMContentLoaded", generateId);
-            </script>            
+            </script>
 
             <div class="contact-list">
                 <h3>Saved Contacts</h3>
@@ -85,7 +88,7 @@
                 <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="sendMessage()">
                 <button onclick="openFileManager()">📁</button>
                 <button onclick="sendMessage()">Send</button>
-            </div>            
+            </div>
 
             <div>
                 <h4>Debug Log:</h4>
@@ -127,14 +130,14 @@
             }
         }
 
-        window.onload = function() {
+        window.onload = function () {
             const savedUsername = localStorage.getItem('username');
             if (savedUsername) {
                 document.getElementById('usernameInput').value = savedUsername;
                 setUsername();
             }
         };
-        
+
         function clearContacts() {
             if (confirm('Are you sure you want to clear all contacts? This cannot be undone.')) {
                 localStorage.removeItem('contacts');
@@ -160,7 +163,7 @@
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     try {
                         const contacts = JSON.parse(e.target.result);
                         localStorage.setItem('contacts', JSON.stringify(contacts));
@@ -271,9 +274,9 @@
                     iceCandidatePoolSize: 10,
                 }
             };
-            
+
             peer = new Peer(persistentId, config);
-            
+
             peer.on('open', (id) => {
                 myId = id;
                 document.getElementById('myId').textContent = id;
@@ -283,7 +286,7 @@
             peer.on('connection', (connection) => {
                 const requesterId = connection.peer;
                 const requesterName = connection.metadata.username || "Unknown User";
-                
+
                 const acceptConnection = confirm(`User ${requesterName} (ID: ${requesterId}) is trying to connect. Do you want to accept this connection?`);
 
                 if (acceptConnection) {
@@ -323,11 +326,11 @@
 
             updateConnectionStatus('Pending connection...');
             connectionRequestPending = true;
-            
+
             const connectionOptions = {
                 reliable: true,
                 serialization: 'json',
-                metadata: { 
+                metadata: {
                     username: username,
                     timestamp: Date.now(),
                     encryptionKey: generateEncryptionKey()
@@ -342,7 +345,7 @@
             conn.on('open', () => {
                 connectionRequestPending = false;
                 updateConnectionStatus('Connected');
-                
+
                 if (conn.metadata?.username) {
                     saveContact(conn.peer, conn.metadata.username);
                 }
@@ -391,7 +394,7 @@
         function handleError(err) {
             document.getElementById('status').textContent = 'Error: ' + err.type;
             document.getElementById('status').className = 'connection-status disconnected';
-            
+
             if (err.type === 'peer-unavailable') {
                 log('Peer not found or unavailable');
             } else if (err.type === 'network' || err.type === 'disconnected') {
@@ -441,21 +444,35 @@
                         const isImage = type.startsWith('image/');
 
                         finalMessage += `
-                            <div class="file-container">
-                                <p><strong>File:</strong> ${name} (${fileSizeKB} KB)</p>
-                                ${isImage 
-                                    ? `<img src="${dataUrl}" alt="${name}" class="message-image" style="max-width: 100%; height: auto;"/>`
-                                    : `<p>File preview not available</p>`
-                                }
-                                <a href="${dataUrl}" download="${name}" class="file-download-link" style="color: red;">
-                                    Download
-                                </a>
-                            </div>
-                        `;
+                <div class="file-container">
+                    <p><strong>File:</strong> ${name} (${fileSizeKB} KB)</p>
+                    ${isImage
+                                ? `<img src="${dataUrl}" alt="${name}" class="message-image" style="max-width: 100%; height: auto;"/>`
+                                : `<p>File preview not available</p>`
+                            }
+                    <a href="${dataUrl}" download="${name}" class="file-download-link" style="color: red;">
+                        Download
+                    </a>
+                </div>
+            `;
                     } catch (error) {
                         console.error("Error reading file:", error);
                     }
                 }
+
+                // Markdown link matching: [text](URL)
+                finalMessage = finalMessage
+                    .replace(/!?\[(.*?)\]\((https?:\/\/[^\s\)]+)\)/g, (match, text, url) => {
+                        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+                    })
+                    // Standalone URL matching for images and links
+                    .replace(/(https?:\/\/[^\s]+)(\s|$)/g, (match, p1, p2) => {
+                        if (p1.endsWith('.jpg') || p1.endsWith('.jpeg') || p1.endsWith('.png') || p1.endsWith('.gif') || p1.endsWith('.bmp')) {
+                            return `<img src="${p1}" alt="Image" class="message-image" style="max-width: 100%; height: auto;"/>${p2}`;
+                        } else {
+                            return `<a href="${p1}" target="_blank" rel="noopener noreferrer">${p1}</a>${p2}`;
+                        }
+                    });
 
                 return finalMessage;
             }
@@ -487,25 +504,26 @@
         }
 
         // Handle Enter key in message input
-        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
         // Handle Enter key in username input
-        document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+        document.getElementById('usernameInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 setUsername();
             }
         });
 
         // Handle Enter key in peer ID input
-        document.getElementById('peerIdInput').addEventListener('keypress', function(e) {
+        document.getElementById('peerIdInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 connectToPeer();
             }
         });
     </script>
 </body>
+
 </html>
