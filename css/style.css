@@ -137,6 +137,49 @@ button:hover {
     margin-right: auto;
 }
 
+/* Markdown */
+.message-link {
+    color: #cc0000;
+    text-decoration: underline;
+}
+
+.message-image {
+    max-width: 100%;
+    height: auto;
+    margin: 8px 0;
+}
+
+.file-download-link {
+    color: #cc0000;
+    text-decoration: underline;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.error {
+    color: #ffa600;
+    font-style: italic;
+}
+
+/* Notification Copy to clipboard */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.toast-notification.show {
+    opacity: 1;
+}
+
 /* Updated image handling */
 .message-image-container {
     width: 100%;
@@ -201,7 +244,6 @@ button:hover {
     font-size: 12px;
 }
 
-/* Updated file handling */
 .file-item {
     background-color: #1a1a1a;
     border-radius: 8px;
