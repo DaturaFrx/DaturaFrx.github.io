@@ -33,7 +33,16 @@
         <div id="mainPanel" style="display: none;">
             <div>
                 <h3>Your ID: <span id="myId">Generating...</span>
-                    <button onclick="copyIdToClipboard()" style="margin-left: 10px;">Copy</button>
+                    <button onclick="copyIdToClipboard()" class="copy-button">Copy</button>
+                    <style>
+                        @media (max-width: 600px) {
+                            .copy-button {
+                                position: relative;
+                                left: 50%;
+                                transform: translateX(-50%);
+                            }
+                        }
+                    </style>
                 </h3>
                 <h3>Your Username: <span id="displayUsername"></span></h3>
                 <div id="status" class="connection-status disconnected">Not connected</div>
