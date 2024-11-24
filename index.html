@@ -1,32 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Markdown to PDF</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --border-color: #333;
-            --button-bg: #333;
-            --button-hover: #555;
-        }
-
-        body.light-theme {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --border-color: #cccccc;
-            --button-bg: #007bff;
-            --button-hover: #0056b3;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #121212;
+            color: #e0e0e0;
             font-family: Arial, sans-serif;
             padding: 20px;
-            transition: all 0.3s ease;
         }
 
         .container {
@@ -50,25 +34,26 @@
         textarea {
             width: 100%;
             height: 200px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
             margin-bottom: 10px;
             padding: 10px;
             font-family: inherit;
         }
 
-        select, input {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
+        select,
+        input {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
             padding: 5px 10px;
             border-radius: 4px;
         }
 
         button {
-            background-color: var(--button-bg);
-            color: var(--text-color);
+            background-color: #333;
+            color: #e0e0e0;
             border: none;
             padding: 10px 15px;
             cursor: pointer;
@@ -80,16 +65,32 @@
         }
 
         button:hover {
-            background-color: var(--button-hover);
+            background-color: #555;
         }
 
-        .output {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            margin-top: 10px;
-            font-family: inherit;
+        .preview-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page-preview {
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
         .spinner {
@@ -103,34 +104,133 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .loading .spinner {
             display: inline-block;
+        }
+
+        .preview-dark {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .preview-light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .us-letter {
+            width: 816px;
+            /* 8.5in * 96dpi */
+            min-height: 1056px;
+            /* 11in * 96dpi */
+        }
+
+        .a4 {
+            width: 795px;
+            /* 210mm * 3.78 */
+            min-height: 1123px;
+            /* 297mm * 3.78 */
+        }
+
+        /* Switch styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #1e1e1e;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: #e0e0e0;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #2196f3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .switch-label {
+            margin-left: 70px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .page-info {
+            margin: 0 10px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.3.2/markdown-it.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <h1>Markdown to PDF</h1>
-        
+
         <div class="controls">
             <div class="control-group">
-                <label for="theme">Theme:</label>
-                <select id="theme" onchange="toggleTheme()">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                </select>
+                <label class="switch">
+                    <input type="checkbox" id="pdfTheme" onchange="updatePreview()" />
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">Dark Theme</span>
+            </div>
+
+            <div class="control-group">
+                <label class="switch">
+                    <input type="checkbox" id="pageSize" onchange="updatePreview()" />
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">A4 (unchecked for US Letter)</span>
             </div>
 
             <div class="control-group">
                 <label for="font">Font:</label>
-                <select id="font">
+                <select id="font" onchange="updatePreview()">
                     <option value="Arial">Arial</option>
                     <option value="Times New Roman">Times New Roman</option>
                     <option value="Courier">Courier</option>
@@ -141,39 +241,131 @@
 
             <div class="control-group">
                 <label for="margin">Margin (mm):</label>
-                <input type="number" id="margin" value="10" min="0" max="50">
+                <input type="number" id="margin" value="20" min="0" max="50" onchange="updatePreview()" />
             </div>
         </div>
 
         <textarea id="markdown" placeholder="Write your markdown here..."></textarea>
-        <br>
+        <br />
         <button onclick="convertToPDF()" id="downloadBtn">
             <span>Download PDF</span>
             <div class="spinner"></div>
         </button>
-        <div id="output" class="output"></div>
+
+        <div class="preview-container">
+            <div id="previewPages"></div>
+            <div class="pagination-controls">
+                <button onclick="previousPage()">Previous</button>
+                <span class="page-info">Page <span id="currentPage">1</span> of
+                    <span id="totalPages">1</span></span>
+                <button onclick="nextPage()">Next</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const md = window.markdownit();
+        let currentPageIndex = 0;
+        let pages = [];
 
-        function toggleTheme() {
-            const theme = document.getElementById('theme').value;
-            document.body.classList.toggle('light-theme', theme === 'light');
-            updatePreview();
+        function calculatePages(content, pageHeight, marginHeight) {
+            const lines = content.split("\n");
+            const pages = [];
+            let currentPage = [];
+            let currentHeight = 0;
+            const lineHeight = 20; // Approximate line height in pixels
+
+            for (const line of lines) {
+                const estimatedHeight = line.length > 0 ? lineHeight : lineHeight / 2;
+
+                if (currentHeight + estimatedHeight > pageHeight - marginHeight * 2) {
+                    pages.push(currentPage.join("\n"));
+                    currentPage = [line];
+                    currentHeight = estimatedHeight;
+                } else {
+                    currentPage.push(line);
+                    currentHeight += estimatedHeight;
+                }
+            }
+
+            if (currentPage.length > 0) {
+                pages.push(currentPage.join("\n"));
+            }
+
+            return pages;
         }
 
         function updatePreview() {
             const markdownInput = document.getElementById("markdown").value;
-            const htmlContent = md.render(markdownInput);
-            const output = document.getElementById("output");
-            output.innerHTML = htmlContent;
-            output.style.fontFamily = document.getElementById("font").value;
+            const theme = document.getElementById("pdfTheme").checked
+                ? "dark"
+                : "light";
+            const font = document.getElementById("font").value;
+            const pageSize = document.getElementById("pageSize").checked
+                ? "a4"
+                : "letter";
+            const margin = document.getElementById("margin").value;
+
+            const previewContainer = document.getElementById("previewPages");
+            const pageHeight = pageSize === "letter" ? 1056 : 1123;
+
+            // Calculate pages
+            pages = calculatePages(markdownInput, pageHeight, margin * 3.78);
+
+            // Update total pages display
+            document.getElementById("totalPages").textContent = pages.length;
+
+            // Reset to first page
+            currentPageIndex = 0;
+            showCurrentPage();
         }
 
-        // Live preview function
-        document.getElementById("markdown").addEventListener("input", updatePreview);
-        document.getElementById("font").addEventListener("change", updatePreview);
+        function showCurrentPage() {
+            const theme = document.getElementById("pdfTheme").checked
+                ? "dark"
+                : "light";
+            const font = document.getElementById("font").value;
+            const pageSize = document.getElementById("pageSize").checked
+                ? "a4"
+                : "letter";
+            const margin = document.getElementById("margin").value + "mm";
+
+            const previewContainer = document.getElementById("previewPages");
+            previewContainer.innerHTML = "";
+
+            const pageDiv = document.createElement("div");
+            pageDiv.className = `page-preview preview-${theme} ${pageSize}`;
+            pageDiv.style.fontFamily = font;
+            pageDiv.style.padding = margin;
+
+            if (pages.length > 0) {
+                const htmlContent = md.render(pages[currentPageIndex]);
+                pageDiv.innerHTML = htmlContent;
+
+                const pageNumber = document.createElement("div");
+                pageNumber.className = "page-number";
+                pageNumber.textContent = `${currentPageIndex + 1} / ${pages.length}`;
+                pageDiv.appendChild(pageNumber);
+            }
+
+            previewContainer.appendChild(pageDiv);
+            document.getElementById("currentPage").textContent =
+                currentPageIndex + 1;
+        }
+
+        function nextPage() {
+            if (currentPageIndex < pages.length - 1) {
+                currentPageIndex++;
+                showCurrentPage();
+            }
+        }
+
+        function previousPage() {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                showCurrentPage();
+            }
+        }
 
         async function convertToPDF() {
             const markdownInput = document.getElementById("markdown").value;
@@ -182,72 +374,69 @@
                 return;
             }
 
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.classList.add('loading');
-            
-            const theme = document.getElementById('theme').value;
-            const font = document.getElementById('font').value;
-            const margin = Number(document.getElementById('margin').value);
+            const downloadBtn = document.getElementById("downloadBtn");
+            downloadBtn.classList.add("loading");
 
-            const htmlContent = md.render(markdownInput);
-            const outputDiv = document.getElementById("output");
-            outputDiv.innerHTML = htmlContent;
-            outputDiv.style.fontFamily = font;
+            const theme = document.getElementById("pdfTheme").checked
+                ? "dark"
+                : "light";
+            const font = document.getElementById("font").value;
+            const margin = Number(document.getElementById("margin").value);
+            const pageSize = document.getElementById("pageSize").checked
+                ? "a4"
+                : "letter";
 
             try {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
-                    unit: 'mm',
-                    format: 'a4',
-                    hotfixes: ["px_scaling"]
+                    unit: "mm",
+                    format: pageSize,
+                    hotfixes: ["px_scaling"],
                 });
 
-                // Set PDF metadata
                 pdf.setProperties({
                     title: "Markdown PDF",
                     subject: "Generated from Markdown",
                     author: "Markdown to PDF Tool",
                     keywords: "markdown, pdf",
-                    creator: "Markdown to PDF Tool"
+                    creator: "Markdown to PDF Tool",
                 });
 
-                // Get page dimensions in mm
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-
-                // Draw background if dark theme
-                if (theme === 'dark') {
-                    pdf.setFillColor(18, 18, 18);
-                    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-                }
-
-                // Capture the content as an image
-                const canvas = await html2canvas(outputDiv, {
-                    backgroundColor: theme === 'dark' ? "#121212" : "#ffffff",
-                    scale: 2,
-                    useCORS: true,
-                    logging: false
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const imgProps = pdf.getImageProperties(imgData);
-                
-                // Calculate dimensions with margins
-                const contentWidth = pageWidth - (2 * margin);
-                const scaledHeight = (imgProps.height * contentWidth) / imgProps.width;
-
-                // Add the image with margins
-                pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, scaledHeight);
-
-                // If content exceeds page height, add more pages
-                let currentHeight = scaledHeight + (2 * margin);
-                while (currentHeight > pageHeight) {
-                    pdf.addPage();
-                    if (theme === 'dark') {
-                        pdf.setFillColor(18, 18, 18);
-                        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+                // Generate each page
+                for (let i = 0; i < pages.length; i++) {
+                    if (i > 0) {
+                        pdf.addPage();
                     }
-                    currentHeight -= pageHeight;
+
+                    // Create temporary preview for this page
+                    const tempDiv = document.createElement("div");
+                    tempDiv.className = `page-preview preview-${theme} ${pageSize}`;
+                    tempDiv.style.fontFamily = font;
+                    tempDiv.style.padding = `${margin}mm`;
+                    tempDiv.innerHTML = md.render(pages[i]);
+                    document.body.appendChild(tempDiv);
+
+                    const canvas = await html2canvas(tempDiv, {
+                        backgroundColor: theme === "dark" ? "#121212" : "#ffffff",
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                    });
+
+                    document.body.removeChild(tempDiv);
+
+                    const imgData = canvas.toDataURL("image/png");
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                    pdf.addImage(
+                        imgData,
+                        "PNG",
+                        margin,
+                        margin,
+                        pdfWidth - 2 * margin,
+                        pdfHeight - 2 * margin
+                    );
                 }
 
                 pdf.save("markdown.pdf");
@@ -255,9 +444,16 @@
                 console.error("PDF generation failed:", error);
                 alert("Failed to generate PDF. Please try again.");
             } finally {
-                downloadBtn.classList.remove('loading');
+                downloadBtn.classList.remove("loading");
             }
         }
+
+        // Initialize preview
+        document
+            .getElementById("markdown")
+            .addEventListener("input", updatePreview);
+        updatePreview();
     </script>
 </body>
+
 </html>
