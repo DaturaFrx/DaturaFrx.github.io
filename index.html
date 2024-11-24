@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to PDF</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --button-bg: #333;
+            --button-hover: #555;
+        }
+
+        body.light-theme {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #cccccc;
+            --button-bg: #007bff;
+            --button-hover: #0056b3;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: inherit;
+        }
+
+        select, input {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-right: 10px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .output {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: inline-block;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.3.2/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown to PDF</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="theme">Theme:</label>
+                <select id="theme" onchange="toggleTheme()">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="font">Font:</label>
+                <select id="font">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier">Courier</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="margin">Margin (mm):</label>
+                <input type="number" id="margin" value="10" min="0" max="50">
+            </div>
+        </div>
+
+        <textarea id="markdown" placeholder="Write your markdown here..."></textarea>
+        <br>
+        <button onclick="convertToPDF()" id="downloadBtn">
+            <span>Download PDF</span>
+            <div class="spinner"></div>
+        </button>
+        <div id="output" class="output"></div>
+    </div>
+
+    <script>
+        const md = window.markdownit();
+
+        function toggleTheme() {
+            const theme = document.getElementById('theme').value;
+            document.body.classList.toggle('light-theme', theme === 'light');
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const markdownInput = document.getElementById("markdown").value;
+            const htmlContent = md.render(markdownInput);
+            const output = document.getElementById("output");
+            output.innerHTML = htmlContent;
+            output.style.fontFamily = document.getElementById("font").value;
+        }
+
+        // Live preview function
+        document.getElementById("markdown").addEventListener("input", updatePreview);
+        document.getElementById("font").addEventListener("change", updatePreview);
+
+        async function convertToPDF() {
+            const markdownInput = document.getElementById("markdown").value;
+            if (!markdownInput.trim()) {
+                alert("Please enter some markdown text first!");
+                return;
+            }
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.classList.add('loading');
+            
+            const theme = document.getElementById('theme').value;
+            const font = document.getElementById('font').value;
+            const margin = Number(document.getElementById('margin').value);
+
+            const htmlContent = md.render(markdownInput);
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = htmlContent;
+            outputDiv.style.fontFamily = font;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    unit: 'mm',
+                    format: 'a4',
+                    hotfixes: ["px_scaling"]
+                });
+
+                // Set PDF metadata
+                pdf.setProperties({
+                    title: "Markdown PDF",
+                    subject: "Generated from Markdown",
+                    author: "Markdown to PDF Tool",
+                    keywords: "markdown, pdf",
+                    creator: "Markdown to PDF Tool"
+                });
+
+                // Get page dimensions in mm
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                // Draw background if dark theme
+                if (theme === 'dark') {
+                    pdf.setFillColor(18, 18, 18);
+                    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+                }
+
+                // Capture the content as an image
+                const canvas = await html2canvas(outputDiv, {
+                    backgroundColor: theme === 'dark' ? "#121212" : "#ffffff",
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = pdf.getImageProperties(imgData);
+                
+                // Calculate dimensions with margins
+                const contentWidth = pageWidth - (2 * margin);
+                const scaledHeight = (imgProps.height * contentWidth) / imgProps.width;
+
+                // Add the image with margins
+                pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, scaledHeight);
+
+                // If content exceeds page height, add more pages
+                let currentHeight = scaledHeight + (2 * margin);
+                while (currentHeight > pageHeight) {
+                    pdf.addPage();
+                    if (theme === 'dark') {
+                        pdf.setFillColor(18, 18, 18);
+                        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+                    }
+                    currentHeight -= pageHeight;
+                }
+
+                pdf.save("markdown.pdf");
+            } catch (error) {
+                console.error("PDF generation failed:", error);
+                alert("Failed to generate PDF. Please try again.");
+            } finally {
+                downloadBtn.classList.remove('loading');
+            }
+        }
+    </script>
+</body>
+</html>
