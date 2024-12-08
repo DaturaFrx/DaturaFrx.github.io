@@ -1,0 +1,314 @@
+<!-- Hola Metiche... KEVIN???? -->
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMG Uploader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.js"></script>
+    <style>
+        .footnote {
+            color: #ffffff1f;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 10;
+            transition: bottom 0.3s ease;
+        }
+        
+        .footnote.with-images {
+            bottom: calc(10px + 100px); /* Adjust 100px to match the height of your image container */
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-content {
+            background-color: #1f2937;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-body">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-10">
+            <header class="space-y-6">
+                <h1 class="text-center text-3xl font-extrabold text-white">
+                    Image Upload & Sharing
+                </h1>
+                <p class="text-center text-sm text-gray-400">
+                    Your images are stored and transmitted
+                </p>
+            </header>
+            <main class="space-y-8">
+                <section class="flex items-center justify-center bg-gray-800 p-8 border-2 border-gray-700 border-dashed rounded-md">
+                    <div class="space-y-4 text-center">
+                        <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex flex-col space-y-2 text-sm text-gray-400">
+                            <label for="fileInput" class="relative cursor-pointer bg-gray-700 rounded-md font-medium text-primary-500 hover:text-primary-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500 py-2 px-4">
+                                <span>Select image(s)</span>
+                                <input id="fileInput" name="fileInput" type="file" accept="image/*" multiple class="sr-only">
+                            </label>
+                            <p>or drag and drop here</p>
+                        </div>
+                        <p class="text-xs text-gray-400">
+                            Supported formats: PNG, JPG, GIF (Single file: 20MB max, Multiple files: 10MB max each)
+                        </p>
+                    </div>
+                </section>
+                <section>
+                    <button id="uploadBtn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Upload Image(s)
+                    </button>
+                </section>
+                <section id="output" class="text-sm text-gray-400 text-center"></section>
+                <section id="linkContainer" class="flex items-center justify-center space-x-4" style="display: none;">
+                    <a id="imageLink" href="#" target="_blank" class="text-primary-500 hover:text-primary-400"></a>
+                    <button id="copyBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-sm">
+                        Copy Link
+                    </button>
+                </section>
+                <img id="uploadedImage" class="rounded-lg shadow-lg max-w-full h-auto mx-auto" style="display: none;" alt="Uploaded image preview">
+            </main>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="uploadProgress" class="text-white">Uploading: 0%</p>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+        import { getDatabase, ref as dbRef, set, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYAmNH5-OAP8cB4LOwvMDtuMb46albZfY",
+            authDomain: "temp-pic-store000.firebaseapp.com",
+            projectId: "temp-pic-store000",
+            storageBucket: "temp-pic-store000.appspot.com",
+            messagingSenderId: "645896344727",
+            appId: "1:645896344727:web:7fb1a8af38165d14bc05d2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        const db = getDatabase(app);
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const output = document.getElementById('output');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const linkContainer = document.getElementById('linkContainer');
+        const imageLink = document.getElementById('imageLink');
+        const copyBtn = document.getElementById('copyBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const uploadProgress = document.getElementById('uploadProgress');
+
+        const generateSafeFilename = (originalFilename) => {
+            const timestamp = Date.now();
+            const safeFilename = originalFilename.replace(/[^a-zA-Z0-9]/g, '_');
+            return `${timestamp}_${safeFilename}`;
+        };
+
+        const uploadImages = async (files) => {
+            if (files.length === 0) {
+                output.textContent = 'Please select at least one image.';
+                return;
+            }
+
+            const isSingleFile = files.length === 1;
+            const maxFileSize = isSingleFile ? 20 * 1024 * 1024 : 10 * 1024 * 1024;
+
+            const folderName = `folder_${Date.now()}`;
+            const uploadPromises = [];
+            const fileUrls = [];
+
+            loadingOverlay.style.display = 'flex';
+            let totalProgress = 0;
+
+            for (const file of files) {
+                if (file.size > maxFileSize) {
+                    output.textContent = `File ${file.name} exceeds ${isSingleFile ? '20MB' : '10MB'} limit.`;
+                    loadingOverlay.style.display = 'none';
+                    return;
+                }
+
+                const safeFilename = generateSafeFilename(file.name);
+                const storageRef = ref(storage, `images/${folderName}/${safeFilename}`);
+
+                const uploadTask = uploadBytesResumable(storageRef, file);
+
+                const uploadPromise = new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            totalProgress += progress / files.length;
+                            uploadProgress.textContent = `Uploading: ${Math.round(totalProgress)}%`;
+                        },
+                        (error) => {
+                            reject(error);
+                        },
+                        async () => {
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            fileUrls.push({ url: downloadURL, filename: safeFilename });
+                            resolve({ ref: storageRef, url: downloadURL, filename: safeFilename });
+                        }
+                    );
+                });
+                uploadPromises.push(uploadPromise);
+            }
+
+            try {
+                const results = await Promise.all(uploadPromises);
+                const folderUrl = isSingleFile ? results[0].url : `folders.html?folder=${encodeURIComponent(folderName)}`;
+
+                output.textContent = 'Image(s) uploaded successfully!';
+                imageLink.href = folderUrl;
+                imageLink.textContent = isSingleFile ? 'Click here to view the image' : 'Click here to view the folder';
+                linkContainer.style.display = 'flex';
+
+                if (isSingleFile) {
+                    uploadedImage.src = results[0].url;
+                    uploadedImage.style.display = 'block';
+                } else {
+                    uploadedImage.style.display = 'none';
+                }
+
+                // Save deletion time (12 hours later) and file metadata
+                const deleteTime = Date.now() + 12 * 60 * 60 * 1000;
+                await set(dbRef(db, `folders/${folderName}`), { 
+                    files: fileUrls.map(file => ({
+                        filename: file.filename,
+                        url: file.url
+                    })),
+                    deleteAt: deleteTime
+                });
+
+                // Schedule deletion in 12 hours
+                setTimeout(async () => {
+                    for (const result of results) {
+                        await deleteObject(result.ref);
+                    }
+                    await remove(dbRef(db, `folders/${folderName}`));
+                    output.textContent = 'Image(s) have been deleted after 12 hours.';
+                    linkContainer.style.display = 'none';
+                    uploadedImage.style.display = 'none';
+                }, 12 * 60 * 60 * 1000);
+
+            } catch (error) {
+                output.textContent = `Error uploading image(s): ${error}`;
+                console.error('Upload error:', error);
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        };
+
+        uploadBtn.addEventListener('click', () => {
+            const files = fileInput.files;
+            if (files.length > 0) {
+                uploadImages(files);
+            } else {
+                output.textContent = 'Please select at least one image.';
+            }
+        });
+
+        const dropZone = document.querySelector('div.flex.items-center.justify-center');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('bg-gray-700');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('bg-gray-700');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            fileInput.files = dt.files;
+            if (dt.files.length > 0) {
+                uploadImages(dt.files);
+            }
+        }
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(imageLink.href).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+
+        // Update file input to allow multiple files
+        fileInput.setAttribute('multiple', '');
+
+        // Add error handling for image loading
+        uploadedImage.addEventListener('error', function() {
+            console.error('Error loading image:', this.src);
+            this.style.display = 'none';
+            output.textContent = 'Error loading image. Please try uploading again.';
+        });
+
+        // Ensure all URLs are absolute
+        function ensureAbsoluteUrl(url) {
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                return url;
+            }
+            return new URL(url, window.location.origin).href;
+        }
+    </script>
+    <p class="footnote">Created by Datura | Last updated: 2024/01/10 | Future enhancements coming soon</p>
+</body>
+</html>
