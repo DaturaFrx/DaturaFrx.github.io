@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-secondary: #1E1E1E;
+            --text-primary: #E0E0E0;
+            --text-secondary: #A0A0A0;
+            --accent-color: #4A90E2;
+            --border-color: #2C2C2C;
+            --hover-color: #2A2A2A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--hover-color);
+            color: var(--accent-color);
+        }
+
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-dark);
+            overflow: hidden;
+        }
+
+        .connection-status {
+            padding: 10px 20px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .connection-status .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .connection-status .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: orange;
+        }
+
+        .connection-status .status-indicator.connected {
+            background-color: green;
+        }
+
+        .content-section {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: scale(1.03);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                height: auto;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                flex-grow: 1;
+                justify-content: space-around;
+            }
+
+            .nav-link {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-link span {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dashboard</h2>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-link active" onclick="showTab('users')">
+                    <i class="ri-user-line"></i>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="nav-link" onclick="showTab('tables')">
+                    <i class="ri-database-line"></i>
+                    <span>Tables</span>
+                </a>
+                <a href="#" class="nav-link" onclick="showTab('queries')">
+                    <i class="ri-search-line"></i>
+                    <span>Queries</span>
+                </a>
+                <a href="#" class="nav-link" onclick="showTab('settings')">
+                    <i class="ri-settings-3-line"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            <div class="connection-status">
+                <div class="status">
+                    <div class="status-indicator" id="connection-status-indicator"></div>
+                    <span id="connection-status">Connecting...</span>
+                </div>
+                <button id="refresh-connection" onclick="refreshConnection()">
+                    <i class="ri-refresh-line"></i>
+                </button>
+            </div>
+
+            <section id="users" class="content-section active">
+                <h2>Users Management</h2>
+                <div id="users-container" class="user-grid"></div>
+            </section>
+
+            <section id="tables" class="content-section">
+                <h2>Database Tables</h2>
+                <div id="tables-container"></div>
+            </section>
+
+            <section id="queries" class="content-section">
+                <h2>Custom Queries</h2>
+                <div id="queries-container"></div>
+            </section>
+
+            <section id="settings" class="content-section">
+                <h2>Connection Settings</h2>
+                <div id="settings-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://ymkvyvwilefeqlcbxhzm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlta3Z5dndpbGVmZXFsY2J4aHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MDU2NjgsImV4cCI6MjA0Nzk4MTY2OH0.vxo566ykAIyrSgS16frr5jwfr8tux_e5ve6RXQk4W1I';
+
+        class SupabaseConnectionManager {
+            constructor(url, anonKey) {
+                this.url = url;
+                this.anonKey = anonKey;
+                this.client = null;
+                this.connectionStatus = document.getElementById('connection-status');
+                this.connectionIndicator = document.getElementById('connection-status-indicator');
+                this.usersContainer = document.getElementById('users-container');
+            }
+
+            initClient() {
+                try {
+                    this.client = supabase.createClient(this.url, this.anonKey);
+                    return true;
+                } catch (error) {
+                    this.updateStatus('Client Initialization Failed: ' + error.message, false);
+                    return false;
+                }
+            }
+
+            updateStatus(message, isSuccess = true) {
+                this.connectionStatus.textContent = message;
+                this.connectionIndicator.classList.toggle('connected', isSuccess);
+            }
+
+            async checkConnection() {
+                if (!this.initClient()) return;
+
+                try {
+                    const { data, error } = await this.client
+                        .from('users')
+                        .select('*')
+                        .limit(10);
+
+                    if (error) {
+                        this.handleConnectionError(error);
+                        return;
+                    }
+
+                    this.displayUsers(data);
+                } catch (err) {
+                    this.updateStatus('Unexpected Error: ' + err.message, false);
+                }
+            }
+
+            handleConnectionError(error) {
+                const errorMessages = {
+                    'PGRST116': 'Users table does not exist. Verify your Supabase setup.',
+                    'REST_ERROR': 'REST API error. Check your configuration.',
+                    'default': 'Connection Failed: ' + error.message
+                };
+
+                this.updateStatus(errorMessages[error.code] || errorMessages['default'], false);
+            }
+
+            displayUsers(data) {
+                if (!data || data.length === 0) {
+                    this.usersContainer.innerHTML = '<p>No users found</p>';
+                    this.updateStatus('Connected, No users found', true);
+                    return;
+                }
+
+                this.updateStatus('Connected - Users Retrieved', true);
+
+                const userHTML = data.map(user => `
+                    <div class="user-card">
+                        <h4>User ID: ${user.user_id || 'N/A'}</h4>
+                        <p>Username: ${user.username || 'N/A'}</p>
+                        <p>Email: ${user.email || 'N/A'}</p>
+                    </div>
+                `).join('');
+
+                this.usersContainer.innerHTML = userHTML;
+            }
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.nav-link[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        function refreshConnection() {
+            const connectionManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
+            connectionManager.checkConnection();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const connectionManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
+            connectionManager.checkConnection();
+        });
+    </script>
+</body>
+
+</html>
