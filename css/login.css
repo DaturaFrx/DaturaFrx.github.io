@@ -1,0 +1,93 @@
+/* General Container */
+.login-container {
+    width: 300px;
+    padding: 20px;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Input Fields */
+.form-input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+    outline: none;
+}
+
+/* Buttons */
+.form-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.accent-color {
+    background-color: var(--accent-color);
+    color: var(--bg-dark);
+}
+
+.accent-color:hover {
+    background-color: darken(var(--accent-color), 10%);
+}
+
+.accent-color:active {
+    background-color: darken(var(--accent-color), 15%);
+    transform: scale(0.98);
+}
+
+/* Error Message */
+.error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 10px;
+    display: none;
+}
+
+/* Animation for fade-in effect */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Animation for header sliding in */
+@keyframes slideIn {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
