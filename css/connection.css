@@ -1,19 +1,25 @@
-#connection-status {
-    text-align: left;
-    padding: 5px;
-    font-size: 12px;
-    position: fixed;
-    top: 0;
-    width: auto;
-    z-index: 1000;
-    border: none;
-    box-shadow: none;
+.connection-status {
+    padding: 10px 20px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.success {
-    color: #3c763d;
+.connection-status .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.error {
-    color: #a94442
+.connection-status .status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: orange;
+}
+
+.connection-status .status-indicator.connected {
+    background-color: green;
 }

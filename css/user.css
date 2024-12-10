@@ -1,0 +1,11 @@
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.user-card {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 15px;
+}

@@ -4,17 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase Connection Dashboard</title>
+    <title>Name Pending</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #121212;
-            --bg-secondary: #1E1E1E;
-            --text-primary: #E0E0E0;
-            --text-secondary: #A0A0A0;
+            /* Background */
+            --bg-dark: #FFFFFF;
+            --bg-secondary: #F4F4F4;
+            /* Text */
+            --text-primary: #121212;
+            --text-secondary: #4A4A4A;
+            /* Extra */
             --accent-color: #4A90E2;
-            --border-color: #2C2C2C;
-            --hover-color: #2A2A2A;
+            --border-color: #D1D1D1;
+            --hover-color: #E8E8E8;
+            transition: all 0.3s ease;
         }
 
         * {
@@ -28,6 +32,25 @@
             background-color: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 10px 15px;
+            background-color: inherit;
+        }
+
+        .light-theme {
+            --bg-dark: #121212;
+            --bg-secondary: #1E1E1E;
+            --text-primary: #E0E0E0;
+            --text-secondary: #A0A0A0;
+            --border-color: #2C2C2C;
+            --hover-color: #2A2A2A;
         }
 
         .app-container {
@@ -83,38 +106,18 @@
             color: var(--accent-color);
         }
 
+        .headers {
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
         .content-area {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             background-color: var(--bg-dark);
             overflow: hidden;
-        }
-
-        .connection-status {
-            padding: 10px 20px;
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .connection-status .status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .connection-status .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: orange;
-        }
-
-        .connection-status .status-indicator.connected {
-            background-color: green;
         }
 
         .content-section {
@@ -127,77 +130,38 @@
         .content-section.active {
             display: block;
         }
-
-        .user-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .user-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .user-card:hover {
-            transform: scale(1.03);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                flex-direction: row;
-                height: auto;
-            }
-
-            .nav-links {
-                flex-direction: row;
-                flex-grow: 1;
-                justify-content: space-around;
-            }
-
-            .nav-link {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .nav-link span {
-                font-size: 0.8rem;
-            }
-        }
     </style>
+    <link rel="stylesheet" href="css/user.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/connection.css">
 </head>
 
 <body>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>Dashboard</h2>
+                <h2 style="padding-right: 20px;">PENIS</h2>
             </div>
             <nav class="nav-links">
                 <a href="#" class="nav-link active" onclick="showTab('users')">
-                    <i class="ri-user-line"></i>
-                    <span>Users</span>
+                    <i class="ri-global-line"></i>
+                    <span>Global</span>
                 </a>
                 <a href="#" class="nav-link" onclick="showTab('tables')">
-                    <i class="ri-database-line"></i>
-                    <span>Tables</span>
+                    <i class="ri-send-plane-2-line"></i>
+                    <span>Messages</span>
                 </a>
                 <a href="#" class="nav-link" onclick="showTab('queries')">
-                    <i class="ri-search-line"></i>
-                    <span>Queries</span>
+                    <i class="ri-question-fill"></i>
+                    <span>NO USE</span>
                 </a>
                 <a href="#" class="nav-link" onclick="showTab('settings')">
                     <i class="ri-settings-3-line"></i>
                     <span>Settings</span>
+                </a>
+                <a href="#" id="theme-toggle" class="nav-link" style="color: #A0A0A0;">
+                    <i class="ri-moon-line"></i>
+                    <span>Theme</span>
                 </a>
             </nav>
         </aside>
@@ -214,27 +178,28 @@
             </div>
 
             <section id="users" class="content-section active">
-                <h2>Users Management</h2>
+                <h2 class="headers">Global Users</h2>
                 <div id="users-container" class="user-grid"></div>
             </section>
 
             <section id="tables" class="content-section">
-                <h2>Database Tables</h2>
+                <h2 class="headers">Messages</h2>
                 <div id="tables-container"></div>
             </section>
 
             <section id="queries" class="content-section">
-                <h2>Custom Queries</h2>
+                <h2 style="color: yellow; background-color: red; padding-left: 10px; font-size: 200px;">NO USE</h2>
                 <div id="queries-container"></div>
             </section>
 
             <section id="settings" class="content-section">
-                <h2>Connection Settings</h2>
+                <h2 class="headers">Settings</h2>
                 <div id="settings-container"></div>
             </section>
         </main>
     </div>
 
+    <script src="js/toggleTheme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://ymkvyvwilefeqlcbxhzm.supabase.co';
