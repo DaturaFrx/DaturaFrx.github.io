@@ -1,31 +1,108 @@
 @media (max-width: 768px) {
-    #theme-toggle {
-        position: static;
-        margin: 10px 0;
-    }
-
     .app-container {
         flex-direction: column;
+        height: auto;
+        min-height: 100vh;
     }
 
     .sidebar {
         width: 100%;
-        flex-direction: row;
         height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-header {
+        justify-content: center;
+        margin-bottom: 15px;
     }
 
     .nav-links {
         flex-direction: row;
-        flex-grow: 1;
         justify-content: space-around;
+        overflow-x: auto;
+        padding: 10px 0;
     }
 
     .nav-link {
         flex-direction: column;
         align-items: center;
+        padding: 8px;
+        gap: 5px;
+    }
+
+    .nav-link i {
+        margin-right: 0;
+        font-size: 1rem;
     }
 
     .nav-link span {
         font-size: 0.8rem;
+    }
+
+    .content-area {
+        width: 100%;
+    }
+
+    .content-section {
+        padding: 15px;
+    }
+
+    #theme-toggle {
+        position: static;
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        order: 1;
+    }
+
+    .headers {
+        text-align: center;
+        font-size: 1.2rem;
+    }
+
+    .connection-status {
+        padding: 10px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .connection-status .status {
+        margin-bottom: 10px;
+    }
+
+    #auth-form {
+        width: 90%;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Additional mobile-specific tweaks */
+@media (max-width: 480px) {
+    .nav-links {
+        flex-wrap: nowrap;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-link {
+        min-width: 70px;
+        flex-shrink: 0;
     }
 }
