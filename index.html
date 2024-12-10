@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Name Pending</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.15.3/dist/argon2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Background */
@@ -130,18 +132,34 @@
         .content-section.active {
             display: block;
         }
+
+
+        @media (max-width: 6000px) {
+            .nav-link.active {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
     </style>
     <link rel="stylesheet" href="css/user.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/connection.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 
 <body>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2 style="padding-right: 20px;">PENIS</h2>
+                <!-- <h2 style="padding-right: 20px;" "></h2> -->
+                <div class="nav-link active"
+                    style="background: none; color: var(--bg-dark) = 'white' 'black' 'white'; display: flex; align-items: center;">
+                    <i class="ri-functions" style="margin-right: 4px;"></i>
+                    <span>Sigma</span>
+                </div>
             </div>
+
             <nav class="nav-links">
                 <a href="#" class="nav-link active" onclick="showTab('users')">
                     <i class="ri-global-line"></i>
@@ -151,9 +169,9 @@
                     <i class="ri-send-plane-2-line"></i>
                     <span>Messages</span>
                 </a>
-                <a href="#" class="nav-link" onclick="showTab('queries')">
-                    <i class="ri-question-fill"></i>
-                    <span>NO USE</span>
+                <a href="#" class="nav-link" onclick="showTab('profile')">
+                    <i class="ri-profile-line"></i>
+                    <span>Profile</span>
                 </a>
                 <a href="#" class="nav-link" onclick="showTab('settings')">
                     <i class="ri-settings-3-line"></i>
@@ -172,8 +190,10 @@
                     <div class="status-indicator" id="connection-status-indicator"></div>
                     <span id="connection-status">Connecting...</span>
                 </div>
-                <button id="refresh-connection" onclick="refreshConnection()">
-                    <i class="ri-refresh-line"></i>
+                <button id="refresh-connection" onclick="refreshConnection()"
+                    style="border: none; background: none; cursor: pointer; padding: 8px;"
+                    aria-label="Refresh Connection">
+                    <i class="ri-refresh-line" style="font-size: 1.5rem; color: #545454;"></i>
                 </button>
             </div>
 
@@ -187,9 +207,29 @@
                 <div id="tables-container"></div>
             </section>
 
-            <section id="queries" class="content-section">
-                <h2 style="color: yellow; background-color: red; padding-left: 10px; font-size: 200px;">NO USE</h2>
-                <div id="queries-container"></div>
+            <section id="profile" class="content-section">
+                <h2 class="headers">Profile</h2>
+                <div id="profile-container">
+                    <div class="auth-container">
+                        <form id="auth-form">
+                            <input type="text" id="username" name="username" placeholder="Username" class="form-input"
+                                required>
+                            <input type="password" id="password" name="password" placeholder="Password"
+                                class="form-input" required>
+                            <input type="email" id="email" name="email" placeholder="Email (optional)"
+                                class="form-input">
+                            <div class="auth-buttons">
+                                <button type="button" id="signup-btn" class="btn btn-signup">
+                                    Sign Up
+                                </button>
+                                <button type="button" id="login-btn" class="btn btn-login">
+                                    Login
+                                </button>
+                            </div>
+                            <p id="error-message" class="error-message"></p>
+                        </form>
+                    </div>
+                </div>
             </section>
 
             <section id="settings" class="content-section">
@@ -199,11 +239,191 @@
         </main>
     </div>
 
-    <script src="js/toggleTheme.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.15.3/dist/argon2.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://ymkvyvwilefeqlcbxhzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlta3Z5dndpbGVmZXFsY2J4aHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MDU2NjgsImV4cCI6MjA0Nzk4MTY2OH0.vxo566ykAIyrSgS16frr5jwfr8tux_e5ve6RXQk4W1I';
+
+        let userAuth;
+
+        window.onload = () => {
+            if (typeof crypto.subtle !== 'undefined') {
+                userAuth = new UserAuth();
+                userAuth.initDOM();
+            } else {
+                console.error('SHA-256 API is not supported by this browser.');
+            }
+        };
+
+        class UserAuth {
+            constructor() {
+                this.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+
+            initDOM() {
+                const container = document.getElementById('profile-container');
+                const loggedInUser = this.getCookie('loggedInUser');
+
+                if (loggedInUser) {
+                    this.showProfile(loggedInUser);
+                    return;
+                }
+
+                const signupBtn = container.querySelector('#signup-btn');
+                const loginBtn = container.querySelector('#login-btn');
+
+                // Ensure that buttons exist before adding event listeners
+                if (!signupBtn || !loginBtn) {
+                    console.error('Signup or Login button not found');
+                    return;
+                }
+
+                signupBtn.addEventListener('click', () => this.signup());
+                loginBtn.addEventListener('click', () => this.login());
+            }
+
+            async signup() {
+                const username = this.normalizeUsername(document.getElementById('username').value.trim());
+                const password = document.getElementById('password').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const errorMsg = document.getElementById('error-message');
+
+                if (!username || !password) {
+                    errorMsg.textContent = "Username and Password are required!";
+                    return;
+                }
+
+                if (!this.validateUsername(username)) {
+                    errorMsg.textContent = "Invalid username. It must be 3-30 characters long and can only contain letters, numbers, and underscores.";
+                    return;
+                }
+
+                // Check if username already exists in the database
+                const { data, error } = await this.supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .single();
+
+                if (data) {
+                    errorMsg.textContent = "Username is already taken. Please choose another.";
+                    return;
+                }
+
+                try {
+                    const hashedPassword = await this.hashPassword(password);
+                    const { data, error } = await this.supabase
+                        .from('users')
+                        .insert({ username, email, password: hashedPassword })
+                        .select();
+
+                    if (error) {
+                        errorMsg.textContent = error.message;
+                        return;
+                    }
+
+                    this.setCookie('loggedInUser', username, 7);
+                    this.showProfile(username);
+                } catch (error) {
+                    errorMsg.textContent = error.message;
+                }
+            }
+
+            async login() {
+                const username = this.normalizeUsername(document.getElementById('username').value.trim());
+                const password = document.getElementById('password').value.trim();
+                const errorMsg = document.getElementById('error-message');
+
+                if (!username || !password) {
+                    errorMsg.textContent = "Username and Password are required!";
+                    return;
+                }
+
+                try {
+                    const { data, error } = await this.supabase
+                        .from('users')
+                        .select('*')
+                        .eq('username', username)
+                        .single();
+
+                    if (error || !data) {
+                        errorMsg.textContent = 'User not found';
+                        return;
+                    }
+
+                    const isValid = await this.verifyPassword(password, data.password);
+                    if (!isValid) {
+                        errorMsg.textContent = 'Invalid password';
+                        return;
+                    }
+
+                    this.setCookie('loggedInUser', username, 7);
+                    this.showProfile(username);
+                } catch (error) {
+                    errorMsg.textContent = error.message;
+                }
+            }
+
+            normalizeUsername(username) {
+                // Normalize username to Instagram's format: Only lowercase, alphanumeric, and underscores allowed
+                return username.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            }
+
+            validateUsername(username) {
+                // Instagram's format: 3-30 characters, letters, numbers, and underscores
+                const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
+                return usernameRegex.test(username);
+            }
+
+            async hashPassword(password) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            }
+
+            async verifyPassword(inputPassword, storedHash) {
+                const inputHash = await this.hashPassword(inputPassword);
+                return inputHash === storedHash;
+            }
+
+            showProfile(username) {
+                const container = document.getElementById('profile-container');
+                container.innerHTML = `
+                <div style="text-align: center;">
+                    <h2>Welcome, ${username}!</h2>
+                    <button id="logout-btn"
+                        style="padding: 10px; background-color: #f44336; color: white;">Logout</button>
+                </div>`;
+                this.setupEventListeners();
+            }
+
+            logout() {
+                this.deleteCookie('loggedInUser');
+                this.initDOM();
+            }
+
+            setCookie(name, value, days) {
+                const expires = new Date(Date.now() + days * 864e5).toUTCString();
+                document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+            }
+
+            getCookie(name) {
+                return document.cookie.split('; ').find(row => row.startsWith(name + '='))?.split('=')[1] || '';
+            }
+
+            deleteCookie(name) {
+                this.setCookie(name, '', -1);
+            }
+
+            setupEventListeners() {
+                const logoutBtn = document.querySelector('#logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => this.logout());
+                }
+            }
+        }
 
         class SupabaseConnectionManager {
             constructor(url, anonKey) {
@@ -267,43 +487,31 @@
                     return;
                 }
 
-                this.updateStatus('Connected - Users Retrieved', true);
+                this.updateStatus('Connected', true);
 
                 const userHTML = data.map(user => `
-                    <div class="user-card">
-                        <h4>User ID: ${user.user_id || 'N/A'}</h4>
-                        <p>Username: ${user.username || 'N/A'}</p>
-                        <p>Email: ${user.email || 'N/A'}</p>
-                    </div>
-                `).join('');
+                <div class="user-card">
+                    <p>ID: ${user.user_id}</p>
+                    <p>Username: ${user.username || 'N/A'}</p>
+                    ${user.email ? `<p>Email: ${user.email}</p>` : ''}
+                </div>
+            `).join('');
 
                 this.usersContainer.innerHTML = userHTML;
             }
         }
 
-        function showTab(tabId) {
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.nav-link[onclick="showTab('${tabId}')"]`).classList.add('active');
-        }
-
-        function refreshConnection() {
-            const connectionManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
-            connectionManager.checkConnection();
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            const connectionManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
-            connectionManager.checkConnection();
+            const supabaseManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (supabaseManager.initClient()) {
+                const userAuth = new UserAuth(supabaseManager.client);
+                userAuth.checkLoginStatus();
+            }
         });
     </script>
+
+    <script src="js/changeTab.js"></script>
+    <script src="js/toggleTheme.js"></script>
 </body>
 
 </html>
