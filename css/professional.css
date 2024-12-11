@@ -1,0 +1,437 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0 15px;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.container {
+    max-width: 1000px;
+    width: 100%;
+    background-color: #141414;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.connection-status {
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.connected {
+    background-color: #1a5928;
+    color: #ffffff;
+}
+
+.disconnected {
+    background-color: #b91c1c;
+    color: #ffffff;
+}
+
+#messageArea {
+    height: 600px;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    overflow-y: auto;
+    margin: 8px 0;
+    padding: 8px;
+    background-color: #0f0f0f;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+#debugArea {
+    height: 80px;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    overflow-y: auto;
+    margin: 8px 0;
+    padding: 8px;
+    font-family: 'SF Mono', Consolas, Monaco, monospace;
+    font-size: 11px;
+    background-color: #1a1a1a;
+    color: #cccccc;
+}
+
+.message-input-container {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+input[type="text"], input[type="password"] {
+    padding: 6px 10px;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+input[type="password"] {
+    width: 160px;
+}
+
+button {
+    padding: 6px 12px;
+    background-color: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+button:hover {
+    background-color: #0369a1;
+    transform: translateY(-1px);
+}
+
+.setup-container {
+    margin-bottom: 15px;
+}
+
+.contact-list {
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    background-color: #141414;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+.message {
+    margin: 4px 0;
+    padding: 6px 10px;
+    border-radius: 3px;
+    max-width: 75%;
+    font-size: 13px;
+}
+
+.sent {
+    background-color: #0284c7;
+    color: #ffffff;
+    margin-left: auto;
+}
+
+.received {
+    background-color: #262626;
+    color: #ffffff;
+    margin-right: auto;
+}
+
+.timestamp {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 2px;
+}
+
+.contact-management {
+    margin: 8px 0;
+    padding: 8px 0;
+    border-top: 1px solid #2a2a2a;
+}
+
+.danger-button {
+    background-color: #991b1b;
+}
+
+.danger-button:hover {
+    background-color: #7f1d1d;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.contact-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    margin: 4px 0;
+    background-color: #1a1a1a;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.contact-item button {
+    padding: 3px 6px;
+    font-size: 12px;
+}
+
+.image-container {
+    display: inline-block;
+    margin: 8px 0;
+    text-align: center;
+}
+
+.message-image {
+    width: 250px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #2a2a2a;
+}
+
+.image-source-link {
+    display: block;
+    font-size: 11px;
+    color: #38bdf8;
+    text-decoration: none;
+    margin-top: 3px;
+}
+
+.image-source-link:hover {
+    color: #7dd3fc;
+}
+
+@media (max-width: 600px) {
+    body {
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #0a0a0a;
+        color: #ffffff;
+        font-size: 15px;
+        line-height: 1.4;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        height: 100vh;
+        height: -webkit-fill-available;
+        overflow: hidden;
+    }
+
+    .inject {
+        display: none;
+    }
+
+    .container {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        background-color: #0a0a0a;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .connection-status {
+        padding: 8px 12px;
+        margin: 8px 8px 4px 8px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        letter-spacing: 0.3px;
+    }
+
+    #messageArea {
+        flex: 1;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        padding: 24px;
+        background-color: #0a0a0a;
+        margin: 0;
+        scroll-behavior: smooth;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 500;
+        box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.1);
+    }
+
+    .message-input-container {
+        padding: 8px 12px;
+        background-color: #141414;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+    }
+
+    input[type="text"], input[type="password"] {
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 16px;
+        padding: 12px 4px;
+        height: 44px;
+        width: 100%;
+        font-weight: 400;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    input[type="text"]::placeholder, input[type="password"]::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+        outline: none;
+    }
+
+    button {
+        min-height: 40px;
+        padding: 8px 16px;
+        background-color: #0284c7;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-size: 15px;
+        font-weight: 600;
+        touch-action: manipulation;
+        -webkit-appearance: none;
+        appearance: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    button:active {
+        transform: scale(0.96);
+        background-color: #0369a1;
+    }
+
+    .message {
+        margin: 6px 0;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 85%;
+        font-size: 15px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .sent {
+        background-color: #0284c7;
+        color: #ffffff;
+        margin-left: auto;
+        border-bottom-right-radius: 4px;
+    }
+
+    .received {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        margin-right: auto;
+        border-bottom-left-radius: 4px;
+    }
+
+    .timestamp {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 4px;
+        padding: 0 4px;
+        font-weight: 500;
+    }
+
+    .contact-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        background-color: #1a1a1a;
+        border-radius: 12px;
+        margin: 6px 0;
+    }
+
+    .contact-item button {
+        padding: 8px 16px;
+        min-height: 36px;
+        font-size: 14px;
+    }
+
+    .image-container {
+        margin: 8px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .message-image {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .danger-button {
+        background-color: #991b1b;
+    }
+
+    .danger-button:active {
+        background-color: #7f1d1d;
+    }
+
+    #debugArea {
+        display: none;
+    }
+
+    /* Prevent pull-to-refresh and improve scrolling */
+    html {
+        overflow: hidden;
+        height: 100%;
+    }
+
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .message, .contact-item, button {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* Minimal scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+
+    /* Safe area insets for notched devices */
+    @supports (padding: max(0px)) {
+        .container {
+            padding-top: max(env(safe-area-inset-top), 0px);
+            padding-bottom: max(env(safe-area-inset-bottom), 0px);
+        }
+        
+        .message-input-container {
+            padding-bottom: max(env(safe-area-inset-bottom) + 8px, 8px);
+            padding-left: max(env(safe-area-inset-left) + 8px, 8px);
+            padding-right: max(env(safe-area-inset-right) + 8px, 8px);
+        }
+    }
+}

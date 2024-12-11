@@ -1,517 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
+    <title>P2P</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Name Pending</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.15.3/dist/argon2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            /* Background */
-            --bg-dark: #FFFFFF;
-            --bg-secondary: #F4F4F4;
-            /* Text */
-            --text-primary: #121212;
-            --text-secondary: #4A4A4A;
-            /* Extra */
-            --accent-color: #4A90E2;
-            --border-color: #D1D1D1;
-            --hover-color: #E8E8E8;
-            transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        #theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            padding: 10px 15px;
-            background-color: inherit;
-        }
-
-        .light-theme {
-            --bg-dark: #121212;
-            --bg-secondary: #1E1E1E;
-            --text-primary: #E0E0E0;
-            --text-secondary: #A0A0A0;
-            --border-color: #2C2C2C;
-            --hover-color: #2A2A2A;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: var(--bg-secondary);
-            padding: 20px;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .sidebar-header h2 {
-            color: var(--text-primary);
-            font-size: 1.5rem;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 15px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link i {
-            font-size: 1.2rem;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background-color: var(--hover-color);
-            color: var(--accent-color);
-        }
-
-        .headers {
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .content-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-dark);
-            overflow: hidden;
-        }
-
-        .content-section {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-
-        @media (max-width: 6000px) {
-            .nav-link.active {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="css/user.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/connection.css">
-    <link rel="stylesheet" href="css/login.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="icon" href="files/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <!-- <h2 style="padding-right: 20px;" "></h2> -->
-                <div class="nav-link active"
-                    style="background: none; color: var(--bg-dark) = 'white' 'black' 'white'; display: flex; align-items: center;">
-                    <i class="ri-functions" style="margin-right: 4px;"></i>
-                    <span>Sigma</span>
-                </div>
+    <div class="container">
+        <div id="toast" class="toast-notification">ID copied to clipboard</div>
+        <script src="js/other/toastNotification.js"></script>
+        <div style="margin-left: 10px;">
+            <h1 style="margin-bottom: 0;">Chat 2.1</h1>
+            <p style="color: #333; margin-top: 0;">Name pending btw lol<br>File sharing isn't working rn</p>
+        </div>
+
+        <button id="jumpButton" class="jump-button" onclick="jumpToMessageArea()">Jump to Message Area</button>
+
+        <div class="setup-container" id="setupPanel">
+            <h3>User Setup</h3>
+            <input type="text" id="usernameInput" placeholder="Enter a display name">
+            <input type="password" id="passwordInput" placeholder="Set a password (optional)">
+            <button onclick="setUsername()">Save Profile</button>
+            <a href="#" onclick="showHelp(); return false;">Help</a>
+            <iframe id="helpFrame" style="display: none; width: 100%; height: 200px; border: 1px solid #ddd;"
+                src="hewlPwease.txt"></iframe>
+        </div>
+        <script src="js/other/showHelp.js"></script>
+
+        <div id="mainPanel" style="display: none;">
+            <div>
+                <h3>Your ID: <span id="myId">Generating...</span>
+                    <button onclick="copyIdToClipboard()">Copy</button>
+                </h3>
+                <h3>Your Username: <span id="displayUsername"></span></h3>
+                <div id="status" class="connection-status disconnected">Not connected</div>
+            </div>
+            <script src="js/other/copyToClipboard.js"></script>
+
+            <div class="contact-list">
+                <h3>Saved Contacts</h3>
+                <div id="savedContacts"></div>
             </div>
 
-            <nav class="nav-links">
-                <a href="#" class="nav-link active" onclick="showTab('users')">
-                    <i class="ri-global-line"></i>
-                    <span>Global</span>
-                </a>
-                <a href="#" class="nav-link" onclick="showTab('tables')">
-                    <i class="ri-send-plane-2-line"></i>
-                    <span>Messages</span>
-                </a>
-                <a href="#" class="nav-link" onclick="showTab('profile')">
-                    <i class="ri-profile-line"></i>
-                    <span>Profile</span>
-                </a>
-                <a href="#" class="nav-link" onclick="showTab('settings')">
-                    <i class="ri-settings-3-line"></i>
-                    <span>Settings</span>
-                </a>
-                <a href="#" id="theme-toggle" class="nav-link" style="color: #A0A0A0;">
-                    <i class="ri-moon-line"></i>
-                    <span>Theme</span>
-                </a>
-            </nav>
-        </aside>
-
-        <main class="content-area">
-            <div class="connection-status">
-                <div class="status">
-                    <div class="status-indicator" id="connection-status-indicator"></div>
-                    <span id="connection-status">Connecting...</span>
-                </div>
-                <button id="refresh-connection" onclick="refreshConnection()"
-                    style="border: none; background: none; cursor: pointer; padding: 8px;"
-                    aria-label="Refresh Connection">
-                    <i class="ri-refresh-line" style="font-size: 1.5rem; color: #545454;"></i>
-                </button>
+            <div>
+                <h3>Connect to a peer:</h3>
+                <input type="text" id="peerIdInput" placeholder="Enter peer ID">
+                <button onclick="connectToPeer()">Connect</button>
             </div>
 
-            <section id="users" class="content-section active">
-                <h2 class="headers">Global Users</h2>
-                <div id="users-container" class="user-grid"></div>
-            </section>
+            <div id="messageArea"></div>
 
-            <section id="tables" class="content-section">
-                <h2 class="headers">Messages</h2>
-                <div id="tables-container"></div>
-            </section>
+            <div class="message-input-container">
+                <input type="text" id="messageInput" placeholder="Type your message">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="sendMessage()">
+                <!--<button onclick="openFileManager()">📁</button> -->
+                <button onclick="sendMessage()">Send</button>
+            </div>
 
-            <section id="profile" class="content-section">
-                <h2 class="headers">Profile</h2>
-                <div id="profile-container">
-                    <div class="auth-container">
-                        <form id="auth-form">
-                            <input type="text" id="username" name="username" placeholder="Username" class="form-input"
-                                required>
-                            <input type="password" id="password" name="password" placeholder="Password"
-                                class="form-input" required>
-                            <input type="email" id="email" name="email" placeholder="Email (optional)"
-                                class="form-input">
-                            <div class="auth-buttons">
-                                <button type="button" id="signup-btn" class="btn btn-signup">
-                                    Sign Up
-                                </button>
-                                <button type="button" id="login-btn" class="btn btn-login">
-                                    Login
-                                </button>
-                            </div>
-                            <p id="error-message" class="error-message"></p>
-                        </form>
-                    </div>
-                </div>
-            </section>
-
-            <section id="settings" class="content-section">
-                <h2 class="headers">Settings</h2>
-                <div id="settings-container"></div>
-            </section>
-        </main>
+            <div>
+                <h4>Debug Log:</h4>
+                <div id="debugArea"></div>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.15.3/dist/argon2.min.js"></script>
     <script>
-        const SUPABASE_URL = 'https://ymkvyvwilefeqlcbxhzm.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlta3Z5dndpbGVmZXFsY2J4aHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MDU2NjgsImV4cCI6MjA0Nzk4MTY2OH0.vxo566ykAIyrSgS16frr5jwfr8tux_e5ve6RXQk4W1I';
+        // move this to file when in the mood
+        const jumpButton = document.createElement('button');
+        jumpButton.id = 'jumpButton';
+        jumpButton.className = 'jump-button';
+        jumpButton.textContent = 'jump';
+        document.body.appendChild(jumpButton);
 
-        let userAuth;
+        const css = `
+.jump-button {
+    padding: 6px 12px;
+    background-color: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: none;
+}
 
-        window.onload = () => {
-            if (typeof crypto.subtle !== 'undefined') {
-                userAuth = new UserAuth();
-                userAuth.initDOM();
-            } else {
-                console.error('SHA-256 API is not supported by this browser.');
+.jump-button:hover {
+    background-color: #0369a1;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .jump-button {
+        width: auto;
+        font-size: 15px;
+        padding: 14px;
+        margin: 0;
+        bottom: 15px;
+        right: 15px;
+        color: #ffffff;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .jump-button:hover {
+        background-color: transparent;
+        transform: translateY(-1px);
+    }
+}`;
+
+        const style = document.createElement('style');
+        style.textContent = css;
+        document.head.appendChild(style);
+
+        // Main functionality
+        function initializeJumpButton() {
+            const messageArea = document.getElementById('messageArea');
+            if (!messageArea) {
+                console.error('Message area not found');
+                return;
             }
-        };
 
-        class UserAuth {
-            constructor() {
-                this.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-
-            initDOM() {
-                const container = document.getElementById('profile-container');
-                const loggedInUser = this.getCookie('loggedInUser');
-
-                if (loggedInUser) {
-                    this.showProfile(loggedInUser);
-                    return;
-                }
-
-                const signupBtn = container.querySelector('#signup-btn');
-                const loginBtn = container.querySelector('#login-btn');
-
-                // Ensure that buttons exist before adding event listeners
-                if (!signupBtn || !loginBtn) {
-                    console.error('Signup or Login button not found');
-                    return;
-                }
-
-                signupBtn.addEventListener('click', () => this.signup());
-                loginBtn.addEventListener('click', () => this.login());
-            }
-
-            async signup() {
-                const username = this.normalizeUsername(document.getElementById('username').value.trim());
-                const password = document.getElementById('password').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const errorMsg = document.getElementById('error-message');
-
-                if (!username || !password) {
-                    errorMsg.textContent = "Username and Password are required!";
-                    return;
-                }
-
-                if (!this.validateUsername(username)) {
-                    errorMsg.textContent = "Invalid username. It must be 3-30 characters long and can only contain letters, numbers, and underscores.";
-                    return;
-                }
-
-                // Check if username already exists in the database
-                const { data, error } = await this.supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', username)
-                    .single();
-
-                if (data) {
-                    errorMsg.textContent = "Username is already taken. Please choose another.";
-                    return;
-                }
-
-                try {
-                    const hashedPassword = await this.hashPassword(password);
-                    const { data, error } = await this.supabase
-                        .from('users')
-                        .insert({ username, email, password: hashedPassword })
-                        .select();
-
-                    if (error) {
-                        errorMsg.textContent = error.message;
-                        return;
+            // Throttle function to limit scroll event firing
+            function throttle(func, limit) {
+                let inThrottle;
+                return function (...args) {
+                    if (!inThrottle) {
+                        func.apply(this, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
                     }
-
-                    this.setCookie('loggedInUser', username, 7);
-                    this.showProfile(username);
-                } catch (error) {
-                    errorMsg.textContent = error.message;
-                }
-            }
-
-            async login() {
-                const username = this.normalizeUsername(document.getElementById('username').value.trim());
-                const password = document.getElementById('password').value.trim();
-                const errorMsg = document.getElementById('error-message');
-
-                if (!username || !password) {
-                    errorMsg.textContent = "Username and Password are required!";
-                    return;
-                }
-
-                try {
-                    const { data, error } = await this.supabase
-                        .from('users')
-                        .select('*')
-                        .eq('username', username)
-                        .single();
-
-                    if (error || !data) {
-                        errorMsg.textContent = 'User not found';
-                        return;
-                    }
-
-                    const isValid = await this.verifyPassword(password, data.password);
-                    if (!isValid) {
-                        errorMsg.textContent = 'Invalid password';
-                        return;
-                    }
-
-                    this.setCookie('loggedInUser', username, 7);
-                    this.showProfile(username);
-                } catch (error) {
-                    errorMsg.textContent = error.message;
-                }
-            }
-
-            normalizeUsername(username) {
-                // Normalize username to Instagram's format: Only lowercase, alphanumeric, and underscores allowed
-                return username.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            }
-
-            validateUsername(username) {
-                // Instagram's format: 3-30 characters, letters, numbers, and underscores
-                const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
-                return usernameRegex.test(username);
-            }
-
-            async hashPassword(password) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(password);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-            }
-
-            async verifyPassword(inputPassword, storedHash) {
-                const inputHash = await this.hashPassword(inputPassword);
-                return inputHash === storedHash;
-            }
-
-            showProfile(username) {
-                const container = document.getElementById('profile-container');
-                container.innerHTML = `
-                <div style="text-align: center;">
-                    <h2>Welcome, ${username}!</h2>
-                    <button id="logout-btn"
-                        style="padding: 10px; background-color: #f44336; color: white;">Logout</button>
-                </div>`;
-                this.setupEventListeners();
-            }
-
-            logout() {
-                this.deleteCookie('loggedInUser');
-                this.initDOM();
-            }
-
-            setCookie(name, value, days) {
-                const expires = new Date(Date.now() + days * 864e5).toUTCString();
-                document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-            }
-
-            getCookie(name) {
-                return document.cookie.split('; ').find(row => row.startsWith(name + '='))?.split('=')[1] || '';
-            }
-
-            deleteCookie(name) {
-                this.setCookie(name, '', -1);
-            }
-
-            setupEventListeners() {
-                const logoutBtn = document.querySelector('#logout-btn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', () => this.logout());
-                }
-            }
-        }
-
-        class SupabaseConnectionManager {
-            constructor(url, anonKey) {
-                this.url = url;
-                this.anonKey = anonKey;
-                this.client = null;
-                this.connectionStatus = document.getElementById('connection-status');
-                this.connectionIndicator = document.getElementById('connection-status-indicator');
-                this.usersContainer = document.getElementById('users-container');
-            }
-
-            initClient() {
-                try {
-                    this.client = supabase.createClient(this.url, this.anonKey);
-                    return true;
-                } catch (error) {
-                    this.updateStatus('Client Initialization Failed: ' + error.message, false);
-                    return false;
-                }
-            }
-
-            updateStatus(message, isSuccess = true) {
-                this.connectionStatus.textContent = message;
-                this.connectionIndicator.classList.toggle('connected', isSuccess);
-            }
-
-            async checkConnection() {
-                if (!this.initClient()) return;
-
-                try {
-                    const { data, error } = await this.client
-                        .from('users')
-                        .select('*')
-                        .limit(10);
-
-                    if (error) {
-                        this.handleConnectionError(error);
-                        return;
-                    }
-
-                    this.displayUsers(data);
-                } catch (err) {
-                    this.updateStatus('Unexpected Error: ' + err.message, false);
-                }
-            }
-
-            handleConnectionError(error) {
-                const errorMessages = {
-                    'PGRST116': 'Users table does not exist. Verify your Supabase setup.',
-                    'REST_ERROR': 'REST API error. Check your configuration.',
-                    'default': 'Connection Failed: ' + error.message
                 };
-
-                this.updateStatus(errorMessages[error.code] || errorMessages['default'], false);
             }
 
-            displayUsers(data) {
-                if (!data || data.length === 0) {
-                    this.usersContainer.innerHTML = '<p>No users found</p>';
-                    this.updateStatus('Connected, No users found', true);
-                    return;
+            // Check if "Your ID" is visible on the screen
+            function isYourIDVisible() {
+                const bodyText = document.body.textContent || '';
+                return bodyText.includes('Your ID');
+            }
+
+            // Check if element is in viewport
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                return (
+                    rect.top >= 0 &&
+                    rect.left >= 0 &&
+                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                );
+            }
+
+            // Update button visibility
+            function updateButtonVisibility() {
+                if (isYourIDVisible()) {
+                    jumpButton.style.display = 'block';
+                } else {
+                    jumpButton.style.display = isInViewport(messageArea) ? 'none' : 'block';
                 }
-
-                this.updateStatus('Connected', true);
-
-                const userHTML = data.map(user => `
-                <div class="user-card">
-                    <p>ID: ${user.user_id}</p>
-                    <p>Username: ${user.username || 'N/A'}</p>
-                    ${user.email ? `<p>Email: ${user.email}</p>` : ''}
-                </div>
-            `).join('');
-
-                this.usersContainer.innerHTML = userHTML;
             }
+
+            // Scroll handler with throttling
+            const throttledUpdateButtonVisibility = throttle(updateButtonVisibility, 100);
+
+            jumpButton.addEventListener('click', () => {
+                messageArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            window.addEventListener('scroll', throttledUpdateButtonVisibility, { passive: true });
+            window.addEventListener('resize', throttledUpdateButtonVisibility, { passive: true });
+
+            updateButtonVisibility();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const supabaseManager = new SupabaseConnectionManager(SUPABASE_URL, SUPABASE_ANON_KEY);
-            if (supabaseManager.initClient()) {
-                const userAuth = new UserAuth(supabaseManager.client);
-                userAuth.checkLoginStatus();
-            }
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeJumpButton);
+        } else {
+            initializeJumpButton();
+        }
     </script>
+</body>
 
-    <script src="js/changeTab.js"></script>
-    <script src="js/toggleTheme.js"></script>
+
+<script>
+    // Global Variables
+    let myId;
+    let peer = null;
+    let conn = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    let username = '';
+    let password = '';
+    let encryptionKey = '';
+</script>
+
+<!-- Links to all js files in order -->
+<script>
+    const jsFiles = ['userInteractions.js', 'userSetUp.js', 'connections.js', 'displayPeerMessage.js', 'messageSending.js', 'encryption.js', 'contacts.js', 'logs.js', 'errorHandling.js'];
+    jsFiles.forEach(file => {
+        const script = document.createElement('script');
+        script.src = `js/${file}`;
+        document.head.appendChild(script);
+    });
+</script>
 </body>
 
 </html>
