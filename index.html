@@ -1,222 +1,183 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
-    <title>P2P</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link rel="icon" href="files/favicon.ico" type="image/png">
-    <link rel="stylesheet" href="css/style.css">
+    <title>Peticiones de Canciones de Radio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+        }
+        .bg-dark-elegant {
+            background-color: #121212;
+        }
+        .text-muted {
+            color: #888888;
+        }
+        .border-accent {
+            border-color: #1a1a1a;
+        }
+        .hover-highlight:hover {
+            background-color: #1e1e1e;
+            transition: background-color 0.3s ease;
+        }
+        .shadow-elegant {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-
-<body>
-    <div class="container">
-        <div id="toast" class="toast-notification">ID copied to clipboard</div>
-        <script src="js/other/toastNotification.js"></script>
-        <div style="margin-left: 10px;">
-            <h1 style="margin-bottom: 0;">Chat 2.1</h1>
-            <p style="color: #333; margin-top: 0;">Name pending btw lol<br>File sharing isn't working rn</p>
+<body class="min-h-screen bg-black p-4">
+    <div class="container mx-auto max-w-xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-white tracking-tight mb-2">Peticiones de Radio</h1>
+            <p class="text-gray-400 text-sm">Elige la música que quieres escuchar</p>
+        </header>
+        
+        <!-- Formulario de Petición -->
+        <div class="mb-8 bg-dark-elegant rounded-xl p-6 shadow-elegant">
+            <form id="peticionForm" class="space-y-4">
+                <div>
+                    <label for="nombreArtista" class="block text-sm text-gray-300 mb-2">Nombre del Artista</label>
+                    <input 
+                        type="text" 
+                        id="nombreArtista" 
+                        placeholder="Escribe el nombre del artista" 
+                        required 
+                        class="w-full p-3 bg-black text-white rounded-lg border border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    >
+                </div>
+                <div>
+                    <label for="nombreCancion" class="block text-sm text-gray-300 mb-2">Nombre de la Canción</label>
+                    <input 
+                        type="text" 
+                        id="nombreCancion" 
+                        placeholder="Escribe el nombre de la canción" 
+                        required 
+                        class="w-full p-3 bg-black text-white rounded-lg border border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    >
+                </div>
+                <button 
+                    type="submit" 
+                    class="w-full bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition-colors duration-300"
+                >
+                    Enviar Petición
+                </button>
+            </form>
         </div>
 
-        <button id="jumpButton" class="jump-button" onclick="jumpToMessageArea()">Jump to Message Area</button>
-
-        <div class="setup-container" id="setupPanel">
-            <h3>User Setup</h3>
-            <input type="text" id="usernameInput" placeholder="Enter a display name">
-            <input type="password" id="passwordInput" placeholder="Set a password (optional)">
-            <button onclick="setUsername()">Save Profile</button>
-            <a href="#" onclick="showHelp(); return false;">Help</a>
-            <iframe id="helpFrame" style="display: none; width: 100%; height: 200px; border: 1px solid #ddd;"
-                src="hewlPwease.txt"></iframe>
-        </div>
-        <script src="js/other/showHelp.js"></script>
-
-        <div id="mainPanel" style="display: none;">
-            <div>
-                <h3>Your ID: <span id="myId">Generating...</span>
-                    <button onclick="copyIdToClipboard()">Copy</button>
-                </h3>
-                <h3>Your Username: <span id="displayUsername"></span></h3>
-                <div id="status" class="connection-status disconnected">Not connected</div>
-            </div>
-            <script src="js/other/copyToClipboard.js"></script>
-
-            <div class="contact-list">
-                <h3>Saved Contacts</h3>
-                <div id="savedContacts"></div>
-            </div>
-
-            <div>
-                <h3>Connect to a peer:</h3>
-                <input type="text" id="peerIdInput" placeholder="Enter peer ID">
-                <button onclick="connectToPeer()">Connect</button>
-            </div>
-
-            <div id="messageArea"></div>
-
-            <div class="message-input-container">
-                <input type="text" id="messageInput" placeholder="Type your message">
-                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="sendMessage()">
-                <!--<button onclick="openFileManager()">📁</button> -->
-                <button onclick="sendMessage()">Send</button>
-            </div>
-
-            <div>
-                <h4>Debug Log:</h4>
-                <div id="debugArea"></div>
-            </div>
-        </div>
+        <!-- Lista de Peticiones -->
+        <section>
+            <h2 class="text-2xl font-semibold text-white mb-4">Peticiones Actuales</h2>
+            <div id="listaPeticiones" class="space-y-4"></div>
+        </section>
     </div>
 
     <script>
-        // move this to file when in the mood
-        const jumpButton = document.createElement('button');
-        jumpButton.id = 'jumpButton';
-        jumpButton.className = 'jump-button';
-        jumpButton.textContent = 'jump';
-        document.body.appendChild(jumpButton);
+        // Configuración de Firebase (igual que antes)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBq9_O298OmuN4z1-R58NNNoGla8kL-5Rg",
+            authDomain: "server-47133.firebaseapp.com",
+            databaseURL: "https://server-47133-default-rtdb.firebaseio.com",
+            projectId: "server-47133",
+            storageBucket: "server-47133.firebasestorage.app",
+            messagingSenderId: "297740261380",
+            appId: "1:297740261380:web:7067719918a5410575bd51",
+            measurementId: "G-ENWSGJSNTL"
+        };
 
-        const css = `
-.jump-button {
-    padding: 6px 12px;
-    background-color: #0284c7;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: none;
-}
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const peticionesRef = database.ref('peticiones');
 
-.jump-button:hover {
-    background-color: #0369a1;
-    transform: translateY(-1px);
-}
+        // Envío de Petición
+        document.getElementById('peticionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombreArtista = document.getElementById('nombreArtista').value;
+            const nombreCancion = document.getElementById('nombreCancion').value;
 
-@media (max-width: 768px) {
-    .jump-button {
-        width: auto;
-        font-size: 15px;
-        padding: 14px;
-        margin: 0;
-        bottom: 15px;
-        right: 15px;
-        color: #ffffff;
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .jump-button:hover {
-        background-color: transparent;
-        transform: translateY(-1px);
-    }
-}`;
+            const nuevaPeticion = {
+                artista: nombreArtista,
+                cancion: nombreCancion,
+                votos: 0,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
 
-        const style = document.createElement('style');
-        style.textContent = css;
-        document.head.appendChild(style);
+            peticionesRef.push(nuevaPeticion);
+            this.reset();
+        });
 
-        // Main functionality
-        function initializeJumpButton() {
-            const messageArea = document.getElementById('messageArea');
-            if (!messageArea) {
-                console.error('Message area not found');
-                return;
-            }
+        // Renderizar Peticiones
+        function renderPeticiones(peticiones) {
+            const listaElemento = document.getElementById('listaPeticiones');
+            listaElemento.innerHTML = '';
 
-            // Throttle function to limit scroll event firing
-            function throttle(func, limit) {
-                let inThrottle;
-                return function (...args) {
-                    if (!inThrottle) {
-                        func.apply(this, args);
-                        inThrottle = true;
-                        setTimeout(() => inThrottle = false, limit);
-                    }
-                };
-            }
+            Object.entries(peticiones).forEach(([key, peticion]) => {
+                const tiempoActual = new Date().getTime();
+                const tiempoPeticion = new Date(peticion.timestamp).getTime();
+                const diferenciaHoras = (tiempoActual - tiempoPeticion) / (1000 * 3600);
 
-            // Check if "Your ID" is visible on the screen
-            function isYourIDVisible() {
-                const bodyText = document.body.textContent || '';
-                return bodyText.includes('Your ID');
-            }
-
-            // Check if element is in viewport
-            function isInViewport(element) {
-                const rect = element.getBoundingClientRect();
-                return (
-                    rect.top >= 0 &&
-                    rect.left >= 0 &&
-                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-                );
-            }
-
-            // Update button visibility
-            function updateButtonVisibility() {
-                if (isYourIDVisible()) {
-                    jumpButton.style.display = 'block';
-                } else {
-                    jumpButton.style.display = isInViewport(messageArea) ? 'none' : 'block';
+                if (diferenciaHoras <= 24) {
+                    const tarjetaPeticion = document.createElement('div');
+                    tarjetaPeticion.className = 'bg-dark-elegant p-4 rounded-lg flex justify-between items-center hover-highlight border border-accent';
+                    tarjetaPeticion.innerHTML = `
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">${peticion.cancion}</h3>
+                            <p class="text-muted">${peticion.artista}</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-gray-400">${peticion.votos} Votos</span>
+                            <button 
+                                onclick="votarPeticion('${key}')" 
+                                class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors duration-300"
+                            >
+                                Votar
+                            </button>
+                        </div>
+                    `;
+                    listaElemento.appendChild(tarjetaPeticion);
                 }
-            }
-
-            // Scroll handler with throttling
-            const throttledUpdateButtonVisibility = throttle(updateButtonVisibility, 100);
-
-            jumpButton.addEventListener('click', () => {
-                messageArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
-
-            window.addEventListener('scroll', throttledUpdateButtonVisibility, { passive: true });
-            window.addEventListener('resize', throttledUpdateButtonVisibility, { passive: true });
-
-            updateButtonVisibility();
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeJumpButton);
-        } else {
-            initializeJumpButton();
+        // Votar Petición
+        function votarPeticion(keyPeticion) {
+            const referenciasPeticion = peticionesRef.child(keyPeticion);
+            referenciasPeticion.transaction((peticionActual) => {
+                if (peticionActual) {
+                    peticionActual.votos = (peticionActual.votos || 0) + 1;
+                }
+                return peticionActual;
+            });
         }
+
+        // Escuchar Cambios en Peticiones
+        peticionesRef.on('value', (snapshot) => {
+            const peticiones = snapshot.val() || {};
+            renderPeticiones(peticiones);
+        });
+
+        // Limpiar Peticiones Antiguas
+        setInterval(() => {
+            const tiempoActual = new Date().getTime();
+            peticionesRef.once('value', (snapshot) => {
+                const peticiones = snapshot.val() || {};
+                Object.entries(peticiones).forEach(([key, peticion]) => {
+                    const tiempoPeticion = new Date(peticion.timestamp).getTime();
+                    const diferenciaHoras = (tiempoActual - tiempoPeticion) / (1000 * 3600);
+                    
+                    if (diferenciaHoras > 24) {
+                        peticionesRef.child(key).remove();
+                    }
+                });
+            });
+        }, 3600000);
     </script>
 </body>
-
-
-<script>
-    // Global Variables
-    let myId;
-    let peer = null;
-    let conn = null;
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-    let username = '';
-    let password = '';
-    let encryptionKey = '';
-</script>
-
-<!-- Links to all js files in order -->
-<script>
-    const jsFiles = ['userInteractions.js', 'userSetUp.js', 'connections.js', 'displayPeerMessage.js', 'messageSending.js', 'encryption.js', 'contacts.js', 'logs.js', 'errorHandling.js'];
-    jsFiles.forEach(file => {
-        const script = document.createElement('script');
-        script.src = `js/${file}`;
-        document.head.appendChild(script);
-    });
-</script>
-</body>
-
 </html>
