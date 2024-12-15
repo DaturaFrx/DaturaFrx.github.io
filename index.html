@@ -35,7 +35,7 @@
 <body class="min-h-screen bg-black p-4">
     <div class="container mx-auto max-w-xl">
         <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-white tracking-tight mb-2">Peticiones de musica</h1>
+            <h1 class="text-4xl font-bold text-white tracking-tight mb-2">Peticiones</h1>
             <p class="text-gray-400 text-sm">Elige la música que quieres escuchar</p>
         </header>
         
@@ -106,7 +106,8 @@
                 artista: nombreArtista,
                 cancion: nombreCancion,
                 votos: 0,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                votantes: {} // Nuevo campo para rastrear votantes
             };
 
             peticionesRef.push(nuevaPeticion);
@@ -118,6 +119,8 @@
             const listaElemento = document.getElementById('listaPeticiones');
             listaElemento.innerHTML = '';
 
+            const userId = generarIdUnico();
+
             Object.entries(peticiones).forEach(([key, peticion]) => {
                 const tiempoActual = new Date().getTime();
                 const tiempoPeticion = new Date(peticion.timestamp).getTime();
@@ -126,6 +129,10 @@
                 if (diferenciaHoras <= 24) {
                     const tarjetaPeticion = document.createElement('div');
                     tarjetaPeticion.className = 'bg-dark-elegant p-4 rounded-lg flex justify-between items-center hover-highlight border border-accent';
+                    
+                    // Verificar si el usuario ya ha votado
+                    const yaVoto = peticion.votantes && peticion.votantes[userId];
+                    
                     tarjetaPeticion.innerHTML = `
                         <div>
                             <h3 class="text-lg font-semibold text-white">${peticion.cancion}</h3>
@@ -134,10 +141,10 @@
                         <div class="flex items-center space-x-3">
                             <span class="text-gray-400">${peticion.votos} Votos</span>
                             <button 
-                                onclick="votarPeticion('${key}')" 
-                                class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors duration-300"
+                                onclick="toggleVoto('${key}')" 
+                                class="bg-${yaVoto ? 'red' : 'gray'}-700 text-white px-3 py-1 rounded-md hover:bg-${yaVoto ? 'red' : 'gray'}-600 transition-colors duration-300"
                             >
-                                Votar
+                                ${yaVoto ? 'Quitar Voto' : 'Votar'}
                             </button>
                         </div>
                     `;
@@ -146,12 +153,42 @@
             });
         }
 
-        // Votar Petición
-        function votarPeticion(keyPeticion) {
+        // Generar ID único para el usuario
+        function generarIdUnico() {
+            // Si ya existe un ID en localStorage, usarlo
+            let userId = localStorage.getItem('userId');
+            
+            // Si no existe, generar uno nuevo
+            if (!userId) {
+                userId = Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userId', userId);
+            }
+            
+            return userId;
+        }
+
+        // Alternar Voto
+        function toggleVoto(keyPeticion) {
+            const userId = generarIdUnico();
             const referenciasPeticion = peticionesRef.child(keyPeticion);
+
             referenciasPeticion.transaction((peticionActual) => {
                 if (peticionActual) {
-                    peticionActual.votos = (peticionActual.votos || 0) + 1;
+                    // Inicializar votantes si no existe
+                    if (!peticionActual.votantes) {
+                        peticionActual.votantes = {};
+                    }
+
+                    // Si ya votó, quitar voto
+                    if (peticionActual.votantes[userId]) {
+                        delete peticionActual.votantes[userId];
+                        peticionActual.votos = Math.max(0, peticionActual.votos - 1);
+                    } 
+                    // Si no ha votado, agregar voto
+                    else {
+                        peticionActual.votantes[userId] = true;
+                        peticionActual.votos = (peticionActual.votos || 0) + 1;
+                    }
                 }
                 return peticionActual;
             });
