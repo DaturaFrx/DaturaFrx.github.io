@@ -64,10 +64,12 @@
                 </div>
                 <button 
                     type="submit" 
+                    id="submitButton"
                     class="w-full bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition-colors duration-300"
                 >
                     Enviar Petición
                 </button>
+                <p id="tiempoEspera" class="text-red-500 text-center hidden"></p>
             </form>
         </div>
 
@@ -96,21 +98,86 @@
         const database = firebase.database();
         const peticionesRef = database.ref('peticiones');
 
+        // Generar ID único para el usuario
+        function generarIdUnico() {
+            let userId = localStorage.getItem('userId');
+            
+            if (!userId) {
+                userId = Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userId', userId);
+            }
+            
+            return userId;
+        }
+
+        // Verificar tiempo de espera para peticiones
+        function verificarTiempoEspera() {
+            const ultimaPeticion = localStorage.getItem('ultimaPeticion');
+            const tiempoActual = new Date().getTime();
+            const tiempoEspera = 2 * 60 * 1000; // 2 minutos en milisegundos
+
+            const submitButton = document.getElementById('submitButton');
+            const tiempoEsperaElemento = document.getElementById('tiempoEspera');
+
+            if (ultimaPeticion) {
+                const tiempoTranscurrido = tiempoActual - parseInt(ultimaPeticion);
+                
+                if (tiempoTranscurrido < tiempoEspera) {
+                    const tiempoRestante = Math.ceil((tiempoEspera - tiempoTranscurrido) / 1000);
+                    
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    
+                    tiempoEsperaElemento.textContent = `Por favor, espera ${tiempoRestante} segundos antes de hacer otra petición.`;
+                    tiempoEsperaElemento.classList.remove('hidden');
+
+                    // Contador regresivo
+                    const intervalId = setInterval(() => {
+                        const tiempoRestanteActual = Math.ceil((tiempoEspera - (new Date().getTime() - parseInt(ultimaPeticion))) / 1000);
+                        
+                        if (tiempoRestanteActual > 0) {
+                            tiempoEsperaElemento.textContent = `Por favor, espera ${tiempoRestanteActual} segundos antes de hacer otra petición.`;
+                        } else {
+                            clearInterval(intervalId);
+                            submitButton.disabled = false;
+                            submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                            tiempoEsperaElemento.classList.add('hidden');
+                        }
+                    }, 1000);
+
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // Envío de Petición
         document.getElementById('peticionForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // Verificar tiempo de espera
+            if (!verificarTiempoEspera()) {
+                return;
+            }
+
             const nombreArtista = document.getElementById('nombreArtista').value;
             const nombreCancion = document.getElementById('nombreCancion').value;
+            const userId = generarIdUnico();
 
             const nuevaPeticion = {
                 artista: nombreArtista,
                 cancion: nombreCancion,
                 votos: 0,
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
-                votantes: {} // Nuevo campo para rastrear votantes
+                votantes: {}, // Nuevo campo para rastrear votantes
+                userId: userId // Añadir ID de usuario a la petición
             };
 
             peticionesRef.push(nuevaPeticion);
+            
+            // Guardar tiempo de última petición
+            localStorage.setItem('ultimaPeticion', new Date().getTime().toString());
+            
             this.reset();
         });
 
@@ -151,20 +218,6 @@
                     listaElemento.appendChild(tarjetaPeticion);
                 }
             });
-        }
-
-        // Generar ID único para el usuario
-        function generarIdUnico() {
-            // Si ya existe un ID en localStorage, usarlo
-            let userId = localStorage.getItem('userId');
-            
-            // Si no existe, generar uno nuevo
-            if (!userId) {
-                userId = Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('userId', userId);
-            }
-            
-            return userId;
         }
 
         // Alternar Voto
@@ -215,6 +268,9 @@
                 });
             });
         }, 3600000);
+
+        // Verificar tiempo de espera al cargar la página
+        window.onload = verificarTiempoEspera;
     </script>
 </body>
 </html>
